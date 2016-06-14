@@ -1,0 +1,74 @@
+<head>
+  <meta charset="utf-8">
+  <title>Build Triage Links for Bugzilla Component(s)</title>
+  <style type="text/css">
+    body {
+      font-family: sans-serif;
+      box-sizing: border-box;
+    }
+    #components {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    #components tr {
+      border-bottom: 1px solid #AAA;
+    }
+    #components td, #components th {
+      vertical-align: top;
+      text-align: left;
+      padding: 1px;
+      margin: 0px;
+    }
+    #components td {
+      white-space: nowrap;
+    }
+    #buglists {
+      position: fixed;
+      bottom: 2px;
+      border: 1px solid black;
+      padding: 4px;
+      background-color: #AAA;
+      right: 2px;
+      min-width: 40%;
+    }
+    #buglists h2 {
+      margin-top: 0px;
+    }
+  </style>
+<body>
+  <h1>Build Triage Links for Bugzilla Components</h1>
+
+  <p>Let's say you are in charge of triaging some set of
+    components at bugzilla.mozilla.org. How do you do that?
+    We'll have some purpose-built triage tools later, but
+    for now you can use this tool to build triage queries
+    to let you effectively triage your components.</p>
+
+  <h2>Select Component(s)</h2>
+
+  <section id="compselector">
+    <p><input id="filter" type="text" placeholder="Filter search...">
+
+    <table id="components">
+      <thead>
+        <tr>
+          <th>
+          <th>Component
+          <td>Description
+      <tbody>
+    </table>
+  </section>
+
+  <section id="buglists">
+    <h2>Bug Lists</h2>
+
+    <ul>
+      <li><a href="#" id="triage-list">No priority decision</a>
+      <li><a href="#" id="stuck-list">NEEDINFO >14 days</a>
+      <li><a href="#" id="review-list">review pending 5 days</a>
+    </ul>
+  </section>
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+  <script type="text/javascript" src="bugzilla.js"></script>
+
