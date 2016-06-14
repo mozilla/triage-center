@@ -51,6 +51,7 @@ function setup_components() {
     return d.component_description;
   });
   rows.exit().remove();
+  document.getElementById('filter').removeAttribute('disabled');
 }
 
 function setup_queries() {
