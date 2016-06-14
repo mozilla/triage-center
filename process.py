@@ -1,8 +1,8 @@
 import json
+import urllib2
 
-#  wget "https://bugzilla.mozilla.org/rest/product?type=accessible&include_fields=id,name,components" -O components.json
-
-d = json.load(open("components.json"))
+fd = urllib2.urlopen("https://bugzilla.mozilla.org/rest/product?type=selectable&include_fields=id,name,components")
+d = json.load(fd)
 
 components = []
 for p in d['products']:
