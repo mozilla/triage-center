@@ -7,13 +7,31 @@ var gComponents;
 function get_components() {
   return fetch("components-min.json")
     .then(function(r) { return r.json(); })
-    .then(function(r) { gComponents = r; });
+    .then(function(r) {
+      gComponents = r;
+      selected_from_url();
+    });
 }
 
+function selected_from_url() {
+  var sp = new URLSearchParams(window.location.search);
+  var components = new Set(sp.getAll("component"));
+  gComponents.forEach(function(c) {
+    var test = c.product_name + ":" + c.component_name;
+    c.selected = components.has(test);
+  });
+  setup_queries();
+}
 
 document.addEventListener("DOMContentLoaded", function() {
   get_components().then(setup_components);
-  d3.select("#filter").on("input", setup_components);
+  d3.select("#filter").on("input", function() {
+    setup_components();
+  });
+  window.addEventListener("popstate", function() {
+    selected_from_url();
+    setup_components();
+  });
 });
 
 function setup_components() {
@@ -39,11 +57,11 @@ function setup_components() {
   new_rows.on("click", function(d) {
     d.selected = !d.selected;
     d3.select(this).select("input").property("checked", d.selected);
+    navigate_url();
     setup_queries();
   });
   new_rows.append("th").append("input")
-    .attr("type", "checkbox")
-    .property("checked", function(d) { return !!d.selected; });
+    .attr("type", "checkbox");
   new_rows.append("th").text(function(d) {
     return d.product_name + ": " + d.component_name;
   });
@@ -51,7 +69,8 @@ function setup_components() {
     return d.component_description;
   });
   rows.exit().remove();
-  document.getElementById('filter').removeAttribute('disabled');
+  rows.selectAll("input").property("checked", function(d) { return !!d.selected;  document.getElementById('filter').removeAttribute('disabled');
+ });
 }
 
 function setup_queries() {
@@ -70,6 +89,17 @@ function setup_queries() {
   }).join("&");
   var to_triage = "https://bugzilla.mozilla.org/buglist.cgi?priority=--&f1=flagtypes.name&o1=substring&resolution=---&n1=1&chfield=%5BBug%20creation%5D&chfieldto=Now&query_format=advanced&chfieldfrom=2016-06-01&bug_status=UNCONFIRMED&bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&v1=needinfo&" + product_params + "&" + component_params;
   document.getElementById("triage-list").href = to_triage;
+}
+
+function navigate_url() {
+  var u = new URL(window.location.href);
+  var sp = u.searchParams;
+  sp.delete("component");
+  var selected = gComponents.filter(function(c) { return c.selected; });
+  selected.forEach(function(c) {
+    sp.append("component", c.product_name + ":" + c.component_name);
+  });
+  window.history.pushState(undefined, undefined, u.href);
 }
 
 // https://bugzilla.mozilla.org/buglist.cgi?priority=--&f1=flagtypes.name&list_id=13068490&o1=substring&resolution=---&n1=1&chfieldto=Now&query_format=advanced&chfield=%5BBug%20creation%5D&chfieldfrom=2016-06-01&bug_status=UNCONFIRMED&bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&v1=needinfo&component=Plug-ins&product=Core
