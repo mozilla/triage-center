@@ -69,8 +69,8 @@ function setup_components() {
     return d.component_description;
   });
   rows.exit().remove();
-  rows.selectAll("input").property("checked", function(d) { return !!d.selected;  document.getElementById('filter').removeAttribute('disabled');
- });
+  rows.selectAll("input").property("checked", function(d) { return !!d.selected; });
+  document.getElementById('filter').removeAttribute('disabled');
 }
 
 function setup_queries() {
