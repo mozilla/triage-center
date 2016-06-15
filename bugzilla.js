@@ -87,8 +87,12 @@ function setup_queries() {
   var component_params = Array.from(components.values()).map(function(c) {
     return "component=" + encodeURIComponent(c);
   }).join("&");
-  var to_triage = "https://bugzilla.mozilla.org/buglist.cgi?priority=--&f1=flagtypes.name&o1=substring&resolution=---&n1=1&chfield=%5BBug%20creation%5D&chfieldto=Now&query_format=advanced&chfieldfrom=2016-06-01&bug_status=UNCONFIRMED&bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&v1=needinfo&" + product_params + "&" + component_params;
+  var to_triage = "https://bugzilla.mozilla.org/buglist.cgi?priority=--&f1=flagtypes.name&o1=substring&resolution=---&n1=1&chfield=%5BBug%20creation%5D&chfieldto=Now&query_format=advanced&chfieldfrom=2016-06-01&v1=needinfo&" + product_params + "&" + component_params;
   document.getElementById("triage-list").href = to_triage;
+  var stale_needinfo = "https://bugzilla.mozilla.org/buglist.cgi?f1=flagtypes.name&o1=substring&resolution=---&chfieldto=Now&query_format=advanced&chfieldfrom=14d&v1=needinfo&" + product_params + "&" + component_params;
+  document.getElementById("stuck-list").href = stale_needinfo;
+  var stale_review = "https://bugzilla.mozilla.org/buglist.cgi?f1=flagtypes.name&o1=regexp&resolution=---&o2=lessthan&query_format=advanced&f2=delta_ts&v1=%28review%7Csuperreview%7Cui-review%7Cfeedback%7Ca11y-review%29%5C%3F&v2=5d&" + product_params + "&" + component_params;
+  document.getElementById("review-list").href = stale_review;
 }
 
 function navigate_url() {
@@ -101,5 +105,3 @@ function navigate_url() {
   });
   window.history.pushState(undefined, undefined, u.href);
 }
-
-// https://bugzilla.mozilla.org/buglist.cgi?priority=--&f1=flagtypes.name&list_id=13068490&o1=substring&resolution=---&n1=1&chfieldto=Now&query_format=advanced&chfield=%5BBug%20creation%5D&chfieldfrom=2016-06-01&bug_status=UNCONFIRMED&bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&v1=needinfo&component=Plug-ins&product=Core
