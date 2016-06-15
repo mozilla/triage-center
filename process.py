@@ -1,12 +1,16 @@
 import json
 import urllib2
 
-fd = urllib2.urlopen("https://bugzilla.mozilla.org/rest/product?type=selectable&include_fields=id,name,components")
+fd = urllib2.urlopen("https://bugzilla.mozilla.org/rest/product?type=selectable&include_fields=id,name,components,is_active")
 d = json.load(fd)
 
 components = []
 for p in d['products']:
+    if not p['is_active']:
+        continue
     for c in p['components']:
+        if not c['is_active']:
+            continue
         component_data = {
             'product_id': p['id'],
             'product_name': p['name'],
