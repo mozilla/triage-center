@@ -81,19 +81,53 @@ function setup_queries() {
     products.add(c.product_name);
     components.add(c.component_name);
   });
-  var product_params = Array.from(products.values()).map(function(c) {
-    return "product=" + encodeURIComponent(c);
-  }).join("&");
-  var component_params = Array.from(components.values()).map(function(c) {
-    return "component=" + encodeURIComponent(c);
-  }).join("&");
 
-  var to_triage = "https://bugzilla.mozilla.org/buglist.cgi?priority=--&f1=flagtypes.name&o1=substring&resolution=---&n1=1&chfield=%5BBug%20creation%5D&chfieldto=Now&query_format=advanced&chfieldfrom=2016-06-01&v1=needinfo&" + product_params + "&" + component_params;
-  document.getElementById("triage-list").href = to_triage;
-  var stale_needinfo = "https://bugzilla.mozilla.org/buglist.cgi?f1=flagtypes.name&o1=substring&v1=needinfo&f2=delta_ts&o2=lessthan&v2=14d&resolution=---&query_format=advanced&" + product_params + "&" + component_params;
-  document.getElementById("stuck-list").href = stale_needinfo;
-  var stale_review = "https://bugzilla.mozilla.org/buglist.cgi?f1=flagtypes.name&o1=regexp&resolution=---&o2=lessthan&query_format=advanced&f2=delta_ts&v1=%28review%7Csuperreview%7Cui-review%7Cfeedback%7Ca11y-review%29%5C%3F&v2=5d&" + product_params + "&" + component_params;
-  document.getElementById("review-list").href = stale_review;
+  var common_params = new URLSearchParams();
+  Array.from(products.values()).forEach(function(p) {
+    common_params.append("product", p);
+  });
+  Array.from(components.values()).forEach(function(c) {
+    common_params.append("component", c);
+  });
+
+  var to_triage = make_search({
+    priority: "--",
+    n1: 1,
+    f1: "flagtypes.name",
+    o1: "substring",
+    v1: "needinfo",
+    resolution: "---",
+    chfield: "[Bug creation]",
+    chfieldto: "Now",
+    query_format: "advanced",
+    chfieldfrom: "2016-06-01",
+  }, common_params);
+
+  document.getElementById("triage-list").href = "https://bugzilla.mozilla.org/buglist.cgi?" + to_triage.toString();
+
+  var stale_needinfo = make_search({
+    f1: "flagtypes.name",
+    o1: "substring",
+    v1: "needinfo",
+    f2: "delta_ts",
+    o2: "lessthan", // means "older than"
+    v2: "14d",
+    resolution: "---",
+    query_format: "advanced",
+  }, common_params);
+  document.getElementById("stuck-list").href = "https://bugzilla.mozilla.org/buglist.cgi?" + stale_needinfo.toString();
+
+  var stale_review = make_search({
+    f1: "flagtypes.name",
+    o1: "regexp",
+    v1: "(review|superreview|ui-review|feedback|a11y-review)\?",
+    resolution: "---",
+    f2: "delta_ts",
+    o2: "lessthan", // means "older than"
+    v2: "5d",
+    query_format: "advanced",
+  }, common_params);
+  document.getElementById("review-list").href = "https://bugzilla.mozilla.org/buglist.cgi?" + stale_review.toString();
 }
 
 function navigate_url() {
@@ -105,4 +139,19 @@ function navigate_url() {
     sp.append("component", c.product_name + ":" + c.component_name);
   });
   window.history.pushState(undefined, undefined, u.href);
+}
+
+function make_search(o, base) {
+  var s = new URLSearchParams(base);
+  Object.keys(o).forEach(function(k) {
+    var v = o[k];
+    if (v instanceof Array) {
+      v.forEach(function(v2) {
+        s.append(k, v2);
+      });
+    } else {
+      s.append(k, v);
+    }
+  });
+  return s;
 }
