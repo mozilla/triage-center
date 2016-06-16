@@ -1,74 +1,105 @@
 <head>
   <meta charset="utf-8">
   <title>Build Triage Links for Bugzilla Component(s)</title>
-  <style type="text/css">
-    body {
-      font-family: sans-serif;
-      box-sizing: border-box;
-    }
-    #components {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    #components tr {
-      border-bottom: 1px solid #AAA;
-    }
-    #components td, #components th {
-      vertical-align: top;
-      text-align: left;
-      padding: 1px;
-      margin: 0px;
-    }
-    #components td {
-      white-space: nowrap;
-    }
-    #buglists {
-      position: fixed;
-      bottom: 2px;
-      border: 1px solid black;
-      padding: 4px;
-      background-color: #AAA;
-      right: 2px;
-      min-width: 40%;
-    }
-    #buglists h2 {
-      margin-top: 0px;
-    }
-  </style>
+  <link rel="stylesheet" type="text/css" href="jquery-ui-1.11.4/jquery-ui.min.css">
+  <link rel="stylesheet" type="text/css" href="index.css">
 <body>
-  <h1>Build Triage Links for Bugzilla Components</h1>
-
-  <p>Let's say you are in charge of triaging some set of
-    components at bugzilla.mozilla.org. How do you do that?
-    We'll have some purpose-built triage tools later, but
-    for now you can use this tool to build triage queries
-    to let you effectively triage your components.</p>
-
-  <h2>Select Component(s)</h2>
-
-  <section id="compselector">
-    <p><input id="filter" type="search" disabled placeholder="Filter search...">
-
-    <table id="components">
-      <thead>
-        <tr>
-          <th>
-          <th>Component
-          <td>Description
-      <tbody>
-    </table>
-  </section>
-
-  <section id="buglists">
-    <h2>Bug Lists</h2>
-
+  <div id="api_key_container" class="ui-widget-header">
+    <input type="password" placeholder="Bugzilla API Key" id="api_key" size="20">
+    <a href="https://bugzilla.mozilla.org/userprefs.cgi?tab=apikey" target="_blank">(help)</a>
+  </div>
+  <section id="tabs">
     <ul>
-      <li><a href="#" target="_blank" id="triage-list">No priority decision</a>
-      <li><a href="#" target="_blank" id="stuck-list">NEEDINFO &gt;14 days</a>
-      <li><a href="#" target="_blank" id="review-list">review pending 5 days</a>
+      <li><a href="#intro">Introduction</a></li>
+      <li><a href="#component-selector">Components</a></li>
+      <li><a href="#need-decision">Decision Needed <span class="badge"></span></a></li>
+      <li><a href="#stale">Attention Needed <span class="badge"></span></a></li>
     </ul>
+    <section id="intro">
+      <h1>Mozilla Bug Triage</h1>
+
+      <p>Let's say you are in charge of triaging some set of
+        components at bugzilla.mozilla.org. How do you do that?
+        We'll have some purpose-built triage tools later, but
+        for now you can use this tool to build triage queries
+        to let you effectively triage your components.</p>
+
+      <p>For more information about the purpose and process of triage,
+        see <a href="https://wiki.mozilla.org/Bugmasters/Process/Triage">the Bugmaster wikipage</a>.</p>
+    </section>
+
+    <section id="component-selector">
+      <h2>Select Component(s)</h2>
+
+      <div id="component-loading"></div>
+
+      <section id="components-section">
+      <p><input id="filter" type="search" disabled placeholder="Filter search..."></p>
+
+      <p>
+        <table id="components">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Component</th>
+              <td>Description</td>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </p>
+      </section>
+    </section>
+    <section id="need-decision">
+      <h2>Decision Needed</h2>
+      <p><a href="#" target="_blank" id="triage-list">View as bug query</a>
+
+      <div class="p"></div>
+      <p>
+        <table class="bugtable">
+          <tbody></tbody>
+        </table>
+      </p>
+    </section>
+    <section id="stale">
+      <h2>Attention Needed</h2>
+      <div id="stale-inner">
+        <h3>NEEDINFO &gt; 14 days</h3>
+        <section id="needinfo-stale">
+          <p><a href="#" target="_blank" id="stuck-list">View as bug query</a></p>
+          <div class="p"></div>
+          <p>
+            <table class="bugtable">
+              <tbody></tbody>
+            </table>
+          </p>
+        </section>
+        <h3>Requests &gt; 5 days</h3>
+        <section id="review-stale">
+          <p><a href="#" target="_blank" id="review-list">View as bug query</a></p>
+          <div class="p"></div>
+          <p>
+            <table class="bugtable">
+              <tbody></tbody>
+            </table>
+          </p>
+        </section>
+      </div>
+    </section>
   </section>
 
+  <section id="templates">
+    <select id="pselector">
+      <option value="--">-- (no decision)</option>
+      <option value="P1">P1 (now)</option>
+      <option value="P2">P2 (next)</option>
+      <option value="P3">P3 (backlog)</option>
+      <option value="P4">P4</option>
+      <option value="P5">P5 (not priority)</option>
+    </select>
+  </section>
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+  <script type="text/javascript" src="jquery-ui-1.11.4/jquery-ui.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
   <script type="text/javascript" src="bugzilla.js"></script>
-

@@ -1,13 +1,42 @@
 var API_BASE = "https://bugzilla.mozilla.org/rest/";
 
+/**
+ * @returns d3.request
+ */
+function make_api_request(path, params, data, method) {
+  var uri = API_BASE + path;
+  if (params) {
+    uri += "?" + params.toString();
+  }
+  var r = d3.json(uri);
+  var api_key = document.getElementById("api_key").value;
+  if (api_key != "") {
+    r.header("X-BUGZILLA-API-KEY", api_key);
+  }
+  if (data) {
+    r.header("Content-Type", "application/json");
+    data = JSON.stringify(data);
+  }
+  if (!method) {
+    if (data) {
+      method = "POST";
+    } else {
+      method = "GET";
+    }
+  }
+  return r.send(method, data);
+}
+
 var gComponents;
 
 function get_components() {
+  $("#component-loading").progressbar({ value: false });
   return fetch("components-min.json")
     .then(function(r) { return r.json(); })
     .then(function(r) {
       gComponents = r;
       selected_from_url();
+      $("#component-loading").hide();
     });
 }
 
@@ -21,7 +50,11 @@ function selected_from_url() {
   setup_queries();
 }
 
-document.addEventListener("DOMContentLoaded", function() {
+$(function() {
+  $(".badge").hide();
+  $("#tabs").tabs({ heightStyle: "fill", active: 1 });
+  $("#stale-inner").accordion({ heightStyle: "content" });
+
   get_components().then(setup_components);
   d3.select("#filter").on("input", function() {
     setup_components();
@@ -100,8 +133,8 @@ function setup_queries() {
     query_format: "advanced",
     chfieldfrom: "2016-06-01",
   }, common_params);
-
   document.getElementById("triage-list").href = "https://bugzilla.mozilla.org/buglist.cgi?" + to_triage.toString();
+  populate_table($("#need-decision"), to_triage);
 
   var stale_needinfo = make_search({
     f1: "flagtypes.name",
@@ -114,6 +147,7 @@ function setup_queries() {
     query_format: "advanced",
   }, common_params);
   document.getElementById("stuck-list").href = "https://bugzilla.mozilla.org/buglist.cgi?" + stale_needinfo.toString();
+  populate_table($("#needinfo-stale"), stale_needinfo);
 
   var stale_review = make_search({
     f1: "flagtypes.name",
@@ -126,6 +160,7 @@ function setup_queries() {
     query_format: "advanced",
   }, common_params);
   document.getElementById("review-list").href = "https://bugzilla.mozilla.org/buglist.cgi?" + stale_review.toString();
+  populate_table($("#review-stale"), stale_review);
 }
 
 function navigate_url() {
@@ -152,4 +187,58 @@ function make_search(o, base) {
     }
   });
   return s;
+}
+
+function bug_description(d) {
+  var s = d.product + ": " + d.component + " - " + d.summary;
+  if (d.keywords.length) {
+    s += " " + d.keywords.join(",");
+  }
+  s += " Owner: " + d.assigned_to;
+  s += " Reporter: " + d.creator;
+  s += " Created: " + d3.time.format("%Y-%m-%d %H:%M")(new Date(d.creation_time));
+  return s;
+}
+
+function populate_table(s, params) {
+  $(".p", s).progressbar({ value: null }).off("click");
+  make_api_request("bug", params).on("load", function(data) {
+    $(".p", s)
+      .button({ icons: { primary: 'ui-icon-refresh' }, label: 'Refresh', text: false })
+      .on("click", function() { populate_table(s, params); });
+    var bugs = data.bugs;
+    bugs.sort(function(a, b) { return d3.ascending(a.id, b.id); });
+    var rows = d3.select(s[0]).select('.bugtable > tbody').selectAll('tr')
+      .data(bugs, function(d) { return d.id; });
+    rows.exit().remove();
+    var new_rows = rows.enter().append("tr");
+    new_rows.append("th").append("a")
+      .attr("href", function(d) { return "https://bugzilla.mozilla.org/show_bug.cgi?id=" + d.id; }).text(function(d) { return d.id; });
+    new_rows.append("td").classed("bugpriority", true).append(clone_by_id("pselector"));
+    new_rows.append("td").classed("bugdescription", true);
+
+    rows.select(".bugpriority > select").property("value", function(d) { return d.priority; })
+      .on("change", function(d) { update_priority(d.id, this.value); });
+    rows.select(".bugdescription").text(bug_description);
+    rows.order();
+  });
+}
+
+function clone_by_id(id) {
+  return function() {
+    var n = document.getElementById(id).cloneNode(true);
+    n.removeAttribute("id");
+    return n;
+  };
+}
+
+function update_priority(id, p) {
+  if (document.getElementById("api_key").value == '') {
+    alert("Please enter an API key");
+    d3.event.target.value = d3.select(d3.event.target).datum().priority;
+    return;
+  }
+  make_api_request("bug/" + id, null, { priority: p }, "PUT").on("load", function(d) {
+    console.log("update", id, p, d);
+  });
 }
