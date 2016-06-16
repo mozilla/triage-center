@@ -31,20 +31,12 @@ body {
 #components td {
   white-space: nowrap;
 }
-.badge {
-  display: inline-block;
-  text-align: center;
-  width: 20px;
-  height: 20px;
-  color: white;
-  background-color: red;
-  border-radius: 10px;
-  margin-left: 5px;
-}
 #templates {
   display: none;
 }
-#api_key_container {
-  text-align: right;
-  font-size: smaller;
+.marker {
+  color: green;
+}
+.marker.pending {
+  color: red;
 }

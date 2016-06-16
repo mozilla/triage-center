@@ -1,5 +1,7 @@
 var API_BASE = "https://bugzilla.mozilla.org/rest/";
 
+var gAPIKey = null; // string or false once the user makes a choice
+
 /**
  * @returns d3.request
  */
@@ -9,9 +11,8 @@ function make_api_request(path, params, data, method) {
     uri += "?" + params.toString();
   }
   var r = d3.json(uri);
-  var api_key = document.getElementById("api_key").value;
-  if (api_key != "") {
-    r.header("X-BUGZILLA-API-KEY", api_key);
+  if (gAPIKey) {
+    r.header("X-BUGZILLA-API-KEY", gAPIKey);
   }
   if (data) {
     r.header("Content-Type", "application/json");
@@ -47,13 +48,44 @@ function selected_from_url() {
     var test = c.product_name + ":" + c.component_name;
     c.selected = components.has(test);
   });
-  setup_queries();
+  if (gAPIKey != null) {
+    setup_queries();
+  }
 }
 
 $(function() {
   $(".badge").hide();
   $("#tabs").tabs({ heightStyle: "fill", active: 1 });
-  $("#stale-inner").accordion({ heightStyle: "content" });
+  $("#api_key_container").dialog({
+    autoOpen: true,
+    buttons: [
+      {
+        text: "ok",
+        click: function() {
+          if ($("#api_key").val() == "") {
+            return;
+          }
+          gAPIKey = $("#api_key").val();
+          if (gComponents) {
+            setup_queries();
+          }
+          $(this).dialog("close");
+        },
+      },
+      {
+        text: "Skip (read-only)",
+        click: function() {
+          gAPIKey = false;
+          if (gComponents) {
+            setup_queries();
+          }
+          $(this).dialog("close");
+        },
+      },
+    ],
+    modal: true,
+  });
+  $("#stale-inner").accordion({ heightStyle: "content", collapsible: true, active: false });
 
   get_components().then(setup_components);
   d3.select("#filter").on("input", function() {
@@ -134,7 +166,7 @@ function setup_queries() {
     chfieldfrom: "2016-06-01",
   }, common_params);
   document.getElementById("triage-list").href = "https://bugzilla.mozilla.org/buglist.cgi?" + to_triage.toString();
-  populate_table($("#need-decision"), to_triage);
+  populate_table($("#need-decision"), to_triage, $("#need-decision-marker"));
 
   var stale_needinfo = make_search({
     f1: "flagtypes.name",
@@ -147,7 +179,7 @@ function setup_queries() {
     query_format: "advanced",
   }, common_params);
   document.getElementById("stuck-list").href = "https://bugzilla.mozilla.org/buglist.cgi?" + stale_needinfo.toString();
-  populate_table($("#needinfo-stale"), stale_needinfo);
+  populate_table($("#needinfo-stale"), stale_needinfo, $("#needinfo-stale-marker"));
 
   var stale_review = make_search({
     f1: "flagtypes.name",
@@ -160,7 +192,7 @@ function setup_queries() {
     query_format: "advanced",
   }, common_params);
   document.getElementById("review-list").href = "https://bugzilla.mozilla.org/buglist.cgi?" + stale_review.toString();
-  populate_table($("#review-stale"), stale_review);
+  populate_table($("#review-stale"), stale_review, $("#review-stale-marker"));
 }
 
 function navigate_url() {
@@ -200,13 +232,18 @@ function bug_description(d) {
   return s;
 }
 
-function populate_table(s, params) {
-  $(".p", s).progressbar({ value: null }).off("click");
+function populate_table(s, params, marker) {
+  $(".p", s).progressbar({ value: false }).off("click");
   make_api_request("bug", params).on("load", function(data) {
     $(".p", s)
       .button({ icons: { primary: 'ui-icon-refresh' }, label: 'Refresh', text: false })
-      .on("click", function() { populate_table(s, params); });
+      .on("click", function() { populate_table(s, params, marker); });
     var bugs = data.bugs;
+    if (!bugs.length) {
+      marker.text("(none!)").removeClass("pending");
+    } else {
+      marker.text("(" + bugs.length + ")").addClass("pending");
+    }
     bugs.sort(function(a, b) { return d3.ascending(a.id, b.id); });
     var rows = d3.select(s[0]).select('.bugtable > tbody').selectAll('tr')
       .data(bugs, function(d) { return d.id; });
