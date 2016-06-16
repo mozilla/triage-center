@@ -87,9 +87,10 @@ function setup_queries() {
   var component_params = Array.from(components.values()).map(function(c) {
     return "component=" + encodeURIComponent(c);
   }).join("&");
+
   var to_triage = "https://bugzilla.mozilla.org/buglist.cgi?priority=--&f1=flagtypes.name&o1=substring&resolution=---&n1=1&chfield=%5BBug%20creation%5D&chfieldto=Now&query_format=advanced&chfieldfrom=2016-06-01&v1=needinfo&" + product_params + "&" + component_params;
   document.getElementById("triage-list").href = to_triage;
-  var stale_needinfo = "https://bugzilla.mozilla.org/buglist.cgi?f1=flagtypes.name&o1=substring&resolution=---&chfieldto=Now&query_format=advanced&chfieldfrom=14d&v1=needinfo&" + product_params + "&" + component_params;
+  var stale_needinfo = "https://bugzilla.mozilla.org/buglist.cgi?f1=flagtypes.name&o1=substring&v1=needinfo&f2=delta_ts&o2=lessthan&v2=14d&resolution=---&query_format=advanced&" + product_params + "&" + component_params;
   document.getElementById("stuck-list").href = stale_needinfo;
   var stale_review = "https://bugzilla.mozilla.org/buglist.cgi?f1=flagtypes.name&o1=regexp&resolution=---&o2=lessthan&query_format=advanced&f2=delta_ts&v1=%28review%7Csuperreview%7Cui-review%7Cfeedback%7Ca11y-review%29%5C%3F&v2=5d&" + product_params + "&" + component_params;
   document.getElementById("review-list").href = stale_review;
