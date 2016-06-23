@@ -66,24 +66,22 @@ $(function() {
             return;
           }
           gAPIKey = $("#api_key").val();
-          if (gComponents) {
-            setup_queries();
-          }
           $(this).dialog("close");
         },
       },
       {
         text: "Skip (read-only)",
-        click: function() {
-          gAPIKey = false;
-          if (gComponents) {
-            setup_queries();
-          }
-          $(this).dialog("close");
-        },
+        click: function() { $(this).dialog("close"); },
       },
     ],
     modal: true,
+  }).on("dialogclose", function() {
+    if (!gAPIKey) {
+      gAPIKey = false;
+    }
+    if (gComponents) {
+      setup_queries();
+    }
   });
   $("#stale-inner").accordion({ heightStyle: "content", collapsible: true, active: false });
 
@@ -136,7 +134,14 @@ function setup_components() {
   document.getElementById('filter').removeAttribute('disabled');
 }
 
+var gPendingQueries = new Set();
+
 function setup_queries() {
+  gPendingQueries.forEach(function(r) {
+    r.abort();
+  });
+  gPendingQueries.clear();
+
   var selected = gComponents.filter(function(c) { return c.selected; });
   var products = new Set();
   var components = new Set();
@@ -166,7 +171,7 @@ function setup_queries() {
     chfieldfrom: "2016-06-01",
   }, common_params);
   document.getElementById("triage-list").href = "https://bugzilla.mozilla.org/buglist.cgi?" + to_triage.toString();
-  populate_table($("#need-decision"), to_triage, $("#need-decision-marker"));
+  populate_table($("#need-decision"), to_triage, $("#need-decision-marker"), !!selected.length);
 
   var stale_needinfo = make_search({
     f1: "flagtypes.name",
@@ -179,7 +184,7 @@ function setup_queries() {
     query_format: "advanced",
   }, common_params);
   document.getElementById("stuck-list").href = "https://bugzilla.mozilla.org/buglist.cgi?" + stale_needinfo.toString();
-  populate_table($("#needinfo-stale"), stale_needinfo, $("#needinfo-stale-marker"));
+  populate_table($("#needinfo-stale"), stale_needinfo, $("#needinfo-stale-marker"), !!selected.length);
 
   var stale_review = make_search({
     f1: "flagtypes.name",
@@ -192,7 +197,7 @@ function setup_queries() {
     query_format: "advanced",
   }, common_params);
   document.getElementById("review-list").href = "https://bugzilla.mozilla.org/buglist.cgi?" + stale_review.toString();
-  populate_table($("#review-stale"), stale_review, $("#review-stale-marker"));
+  populate_table($("#review-stale"), stale_review, $("#review-stale-marker"), !!selected.length);
 }
 
 function navigate_url() {
@@ -232,12 +237,18 @@ function bug_description(d) {
   return s;
 }
 
-function populate_table(s, params, marker) {
+function populate_table(s, params, marker, some_selected) {
+  if (!some_selected) {
+    $(".p", s).hide();
+    d3.select(s[0]).selectAll('.bugtable > tbody > tr').remove();
+    return;
+  }
   $(".p", s).progressbar({ value: false }).off("click");
-  make_api_request("bug", params).on("load", function(data) {
+  var r = make_api_request("bug", params).on("load", function(data) {
+    gPendingQueries.delete(r);
     $(".p", s)
       .button({ icons: { primary: 'ui-icon-refresh' }, label: 'Refresh', text: false })
-      .on("click", function() { populate_table(s, params, marker); });
+      .on("click", function() { populate_table(s, params, marker, true); });
     var bugs = data.bugs;
     if (!bugs.length) {
       marker.text("(none!)").removeClass("pending");
@@ -258,7 +269,11 @@ function populate_table(s, params, marker) {
       .on("change", function(d) { update_priority(d.id, this.value); });
     rows.select(".bugdescription").text(bug_description);
     rows.order();
+  }).on("error", function(e) {
+    console.log("XHR error", r, e, this);
+    gPendingQueries.delete(r);
   });
+  gPendingQueries.add(r);
 }
 
 function clone_by_id(id) {
