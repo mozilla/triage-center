@@ -1,0 +1,42 @@
+body {
+  font-family: sans-serif;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+#tabs {
+  height: 100%;
+  padding: 0;
+  flex: 1;
+}
+#tabs > section {
+}
+#components {
+  width: 100%;
+  border-collapse: collapse;
+}
+#components tr {
+  border-bottom: 1px solid #AAA;
+}
+#components td, #components th {
+  vertical-align: top;
+  text-align: left;
+  padding: 1px;
+  margin: 0px;
+}
+#components td {
+  white-space: nowrap;
+}
+#templates {
+  display: none;
+}
+.marker {
+  color: green;
+}
+.marker.pending {
+  color: red;
+}
