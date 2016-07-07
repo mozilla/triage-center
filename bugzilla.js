@@ -65,6 +65,7 @@ $(function() {
           if ($("#api_key").val() == "") {
             return;
           }
+          $("#api_key_container").submit();
           gAPIKey = $("#api_key").val();
           $(this).dialog("close");
         },
