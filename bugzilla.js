@@ -1,7 +1,5 @@
 var API_BASE = "https://bugzilla.mozilla.org/rest/";
 
-var gAPIKey = null; // string or false once the user makes a choice
-
 /**
  * @returns d3.request
  */
@@ -11,20 +9,10 @@ function make_api_request(path, params, data, method) {
     uri += "?" + params.toString();
   }
   var r = d3.json(uri);
-  if (gAPIKey) {
-    r.header("X-BUGZILLA-API-KEY", gAPIKey);
-  }
-  if (data) {
-    r.header("Content-Type", "application/json");
-    data = JSON.stringify(data);
-  }
-  if (!method) {
-    if (data) {
-      method = "POST";
-    } else {
-      method = "GET";
-    }
-  }
+
+  method = "GET";
+  data = null;
+
   return r.send(method, data);
 }
 
@@ -48,42 +36,12 @@ function selected_from_url() {
     var test = c.product_name + ":" + c.component_name;
     c.selected = components.has(test);
   });
-  if (gAPIKey != null) {
-    setup_queries();
-  }
+  setup_queries();
 }
 
 $(function() {
   $(".badge").hide();
   $("#tabs").tabs({ heightStyle: "fill", active: 1 });
-  $("#api_key_container").dialog({
-    autoOpen: true,
-    buttons: [
-      {
-        text: "ok",
-        click: function() {
-          if ($("#api_key").val() == "") {
-            return;
-          }
-          $("#api_key_container").submit();
-          gAPIKey = $("#api_key").val();
-          $(this).dialog("close");
-        },
-      },
-      {
-        text: "Skip (read-only)",
-        click: function() { $(this).dialog("close"); },
-      },
-    ],
-    modal: true,
-  }).on("dialogclose", function() {
-    if (!gAPIKey) {
-      gAPIKey = false;
-    }
-    if (gComponents) {
-      setup_queries();
-    }
-  });
   $("#stale-inner").accordion({ heightStyle: "content", collapsible: true, active: false });
 
   get_components().then(setup_components);
@@ -238,6 +196,33 @@ function bug_description(d) {
   return s;
 }
 
+function bug_priority(d) {
+    var priority = '';
+    switch (d.priority.toLowerCase()) {
+        case '--':
+            priority = 'No Priority';
+            break;
+        case 'p1':
+            priority = 'P1: This Release/Iteration';
+            break;
+        case 'p2':
+            priority = 'P2: Next Release/Iteration';
+            break;
+        case 'p3':
+            priority = 'P3: Backlog';
+            break;
+        case 'p4':
+            priority = 'P4: Backlog (but should be P3)';
+            break;
+        case 'p5':
+            priority = 'P5: Won\'t fix but will accept a patch';
+            break;
+        default:
+            priority = 'Undefined (this shouldn\'t happen)';
+    }
+    return priority;
+}
+
 function populate_table(s, params, marker, some_selected) {
   if (!some_selected) {
     $(".p", s).hide();
@@ -263,11 +248,9 @@ function populate_table(s, params, marker, some_selected) {
     var new_rows = rows.enter().append("tr");
     new_rows.append("th").append("a")
       .attr("href", function(d) { return "https://bugzilla.mozilla.org/show_bug.cgi?id=" + d.id; }).text(function(d) { return d.id; });
-    new_rows.append("td").classed("bugpriority", true).append(clone_by_id("pselector"));
+    new_rows.append("td").classed("bugpriority", true);
     new_rows.append("td").classed("bugdescription", true);
-
-    rows.select(".bugpriority > select").property("value", function(d) { return d.priority; })
-      .on("change", function(d) { update_priority(d.id, this.value); });
+    rows.select(".bugpriority ").text(bug_priority);
     rows.select(".bugdescription").text(bug_description);
     rows.order();
   }).on("error", function(e) {
@@ -277,21 +260,3 @@ function populate_table(s, params, marker, some_selected) {
   gPendingQueries.add(r);
 }
 
-function clone_by_id(id) {
-  return function() {
-    var n = document.getElementById(id).cloneNode(true);
-    n.removeAttribute("id");
-    return n;
-  };
-}
-
-function update_priority(id, p) {
-  if (document.getElementById("api_key").value == '') {
-    alert("Please enter an API key");
-    d3.event.target.value = d3.select(d3.event.target).datum().priority;
-    return;
-  }
-  make_api_request("bug/" + id, null, { priority: p }, "PUT").on("load", function(d) {
-    console.log("update", id, p, d);
-  });
-}

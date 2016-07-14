@@ -1,13 +1,14 @@
+<!DOCTYPE html>
+<html>
 <head>
   <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Build Triage Links for Bugzilla Component(s)</title>
   <link rel="stylesheet" type="text/css" href="jquery-ui-1.11.4/jquery-ui.min.css">
   <link rel="stylesheet" type="text/css" href="index.css">
+</head>
 <body>
-  <form id="api_key_container" action="javascript:void(0)">
-    <input type="password" placeholder="Bugzilla API Key" id="api_key" size="20">
-    <a href="https://bugzilla.mozilla.org/userprefs.cgi?tab=apikey" target="_blank">(help)</a>
-  </form>
   <section id="tabs">
     <ul>
       <li><a href="#intro">Introduction</a></li>
@@ -87,18 +88,10 @@
     </section>
   </section>
 
-  <section id="templates">
-    <select id="pselector">
-      <option value="--">-- (no decision)</option>
-      <option value="P1">P1 (now)</option>
-      <option value="P2">P2 (next)</option>
-      <option value="P3">P3 (backlog)</option>
-      <option value="P4">P4</option>
-      <option value="P5">P5 (not priority)</option>
-    </select>
-  </section>
 
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
   <script type="text/javascript" src="jquery-ui-1.11.4/jquery-ui.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
   <script type="text/javascript" src="bugzilla.js"></script>
+</body>
+</html>
