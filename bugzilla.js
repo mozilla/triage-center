@@ -157,6 +157,60 @@ function setup_queries() {
   }, common_params);
   document.getElementById("review-list").href = "https://bugzilla.mozilla.org/buglist.cgi?" + stale_review.toString();
   populate_table($("#review-stale"), stale_review, $("#review-stale-marker"), !!selected.length);
+
+  var stale_decision = make_search({
+    keywords: "regression",
+    keywords_type: "allwords",
+    v1: "affected,unaffected,fixed,verified,disabled,verified,disabled,wontfix,fix-optional",
+    chfieldto: "Now",
+    o1: "nowords",
+    chfield: "[Bug creation]",
+    chfieldfrom: "2016-03-08", // change to date of first beta of next version at release
+    f1: "cf_status_firefox48", // change to next version at release
+    resolution: "---",
+    query_format: "advanced"
+  }, common_params);
+
+  document.getElementById("decision-list").href = "https://bugzilla.mozilla.org/buglist.cgi?" + stale_decision.toString();
+  populate_table($("#decision-stale"), stale_decision, $("#decision-stale-marker"), !!selected.length);
+
+  var stale_range = make_search({
+    chfield: "[Bug creation]",
+    chfieldfrom: "2016-03-08",
+    chfieldto: "Now",
+    f10: "OP",
+    f11: "cf_has_regression_range",
+    f12: "cf_has_regression_range",
+    f13: "CP",
+    f1: "OP",
+    f2: "keywords",
+    f3: "CP", 
+    f4: "OP",
+    f5: "cf_status_firefox48",
+    f6: "cf_status_firefox49",
+    f7: "cf_status_firefox50",
+    f8: "CP",
+    j10: "OR",
+    j_top: "OR",
+    keywords: "regression",
+    keywords_type: "allwords",
+    o11: "equals",
+    o12: "equals",
+    o2: "substring",
+    o5: "nowords",
+    o6: "nowords",
+    o7: "nowords",
+    query_format: "advanced",
+    resolution: "---",
+    v11: "no",
+    v12: "---",
+    v2: "regressionwindow-wanted",
+    v5: "affected,unaffected,fixed,verified,disabled,verified disabled,wontfix,fix-optional",
+    v6: "affected,unaffected,fixed,verified,disabled,verified disabled,wontfix,fix-optional",
+    v7: "affected,unaffected,fixed,verified,disabled,verified disabled,wontfix,fix-optional"
+  }, common_params);
+  document.getElementById("range-list").href = "https://bugzilla.mozilla.org/buglist.cgi?" + stale_range.toString();
+  populate_table($("#range-stale"), stale_range, $("#range-stale-marker"), !!selected.length);
 }
 
 function navigate_url() {

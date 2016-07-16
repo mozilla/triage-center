@@ -25,7 +25,10 @@
         to let you effectively triage your components.</p>
 
       <p>For more information about the purpose and process of triage,
-        see <a href="https://wiki.mozilla.org/Bugmasters/Process/Triage">the Bugmaster wikipage</a>.</p>
+        see <a href="https://wiki.mozilla.org/Bugmasters/Process/Triage">our page on the Mozilla wiki</a>.</p>
+
+      <p>This code lives at <a href="https://github.com/mozilla/triage-center">Github in the triage-center project</a>. Pull requests welcome.</p>
+
     </section>
 
     <section id="component-selector">
@@ -55,7 +58,7 @@
       <div id="stale-inner">
         <h3>Triage decision needed <span id="need-decision-marker" class="marker"></span></h3>
         <section id="need-decision">
-          <p><a href="#" target="_blank" id="triage-list">View as bug query</a></p>
+          <p><a href="#" target="_blank" id="triage-list">View as bug list</a></p>
           <div class="p"></div>
           <p>
             <table class="bugtable">
@@ -66,7 +69,7 @@
 
         <h3>NEEDINFO &gt; 14 days <span id="needinfo-stale-marker" class="marker"></span></h3>
         <section id="needinfo-stale">
-          <p><a href="#" target="_blank" id="stuck-list">View as bug query</a></p>
+          <p><a href="#" target="_blank" id="stuck-list">View as bug list</a></p>
           <div class="p"></div>
           <p>
             <table class="bugtable">
@@ -74,9 +77,10 @@
             </table>
           </p>
         </section>
+
         <h3>Requests &gt; 5 days <span id="review-stale-marker" class="marker"></span></h3>
         <section id="review-stale">
-          <p><a href="#" target="_blank" id="review-list">View as bug query</a></p>
+          <p><a href="#" target="_blank" id="review-list">View as bug list</a></p>
           <div class="p"></div>
           <p>
             <table class="bugtable">
@@ -84,6 +88,29 @@
             </table>
           </p>
         </section>
+
+        <h3>Regressions that need a decision for next release <span id="decision-stale-marker" class="marker"></span></h3>
+        <section id="decision-stale">
+          <p><a href="#" target="_blank" id="decision-list">View as bug list</a></p>
+          <div class="p"></div>
+          <p>
+            <table class="bugtable">
+              <tbody></tbody>
+            </table>
+          </p>
+        </section>
+
+        <h3>Regressions without a range <span id="range-stale-marker" class="marker"></span></h3>
+        <section id="range-stale">
+          <p><a href="#" target="_blank" id="range-list">View as bug list</a></p>
+          <div class="p"></div>
+          <p>
+            <table class="bugtable">
+              <tbody></tbody>
+            </table>
+          </p>
+        </section>   
+     
       </div>
     </section>
   </section>
@@ -95,3 +122,4 @@
   <script type="text/javascript" src="bugzilla.js"></script>
 </body>
 </html>
+
