@@ -165,7 +165,7 @@ function setup_queries() {
     chfieldto: "Now",
     o1: "nowords",
     chfield: "[Bug creation]",
-    chfieldfrom: "2016-04-26", // change to date of first nightly of next version at release
+    chfieldfrom: "2016-04-25", // change to date of first nightly of next version at release
     f1: "cf_status_firefox49", // change to next version at release
     resolution: "---",
     query_format: "advanced"
@@ -176,7 +176,7 @@ function setup_queries() {
 
   var stale_range = make_search({
     chfield: "[Bug creation]",
-    chfieldfrom: "2016-04-26", // change to date of first nightly of next version at release
+    chfieldfrom: "2016-04-25", // change to date of first nightly of next version at release
     chfieldto: "Now",
     f10: "OP",
     f11: "cf_has_regression_range",
