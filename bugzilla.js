@@ -148,7 +148,7 @@ function setup_queries() {
   var stale_review = make_search({
     f1: "flagtypes.name",
     o1: "regexp",
-    v1: "(review|superreview|ui-review|feedback|a11y-review)\\?",
+    v1: "^(review|superreview|ui-review|feedback|a11y-review)\\?",
     resolution: "---",
     f2: "delta_ts",
     o2: "lessthan", // means "older than"
