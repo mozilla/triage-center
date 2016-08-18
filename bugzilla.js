@@ -44,7 +44,13 @@ $(function() {
   $("#tabs").tabs({ heightStyle: "fill", active: 1 });
   $("#stale-inner").accordion({ heightStyle: "content", collapsible: true, active: false });
 
-  get_components().then(setup_components);
+  get_components().then(setup_components).then(() => {
+    var selected = gComponents.filter(function(c) { return c.selected; });
+    if (selected.length) {
+      // Select the "stale" tab
+      $("#tabs").tabs("option", "active", 2);
+    }
+  });
   d3.select("#filter").on("input", function() {
     setup_components();
   });
