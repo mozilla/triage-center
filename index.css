@@ -40,3 +40,23 @@ body {
 .marker.pending {
   color: red;
 }
+
+.bugtable {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.bugdescription,
+.bugusers {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bugdescription {
+  width: 35%;
+}
+
+.bugcreated {
+  /* wrap between the day (10 characters) and time */
+  width: 10ch;
+}

@@ -239,15 +239,26 @@ function make_search(o, base) {
   return s;
 }
 
+function bug_component(d) {
+  return d.product + ": " + d.component;
+}
+
 function bug_description(d) {
-  var s = d.product + ": " + d.component + " - " + d.summary;
+  var s = d.summary;
   if (d.keywords.length) {
     s += " " + d.keywords.join(",");
   }
-  s += " Owner: " + d.assigned_to;
-  s += " Reporter: " + d.creator;
-  s += " Created: " + d3.time.format("%Y-%m-%d %H:%M")(new Date(d.creation_time));
   return s;
+}
+
+function bug_users(d) {
+  var s = "Owner: " + d.assigned_to;
+  s += " Reporter: " + d.creator;
+  return s;
+}
+
+function bug_created(d) {
+  return d3.time.format("%Y-%m-%d %H:%M")(new Date(d.creation_time));
 }
 
 function bug_priority(d) {
@@ -304,8 +315,14 @@ function populate_table(s, params, marker, some_selected) {
       .attr("href", function(d) { return "https://bugzilla.mozilla.org/show_bug.cgi?id=" + d.id; }).text(function(d) { return d.id; });
     new_rows.append("td").classed("bugpriority", true);
     new_rows.append("td").classed("bugdescription", true);
+    new_rows.append("td").classed("bugcomponent", true);
+    new_rows.append("td").classed("bugusers", true);
+    new_rows.append("td").classed("bugcreated", true);
     rows.select(".bugpriority ").text(bug_priority);
     rows.select(".bugdescription").text(bug_description);
+    rows.select(".bugcomponent").text(bug_component);
+    rows.select(".bugusers").text(bug_users);
+    rows.select(".bugcreated").text(bug_created);
     rows.order();
   }).on("error", function(e) {
     console.log("XHR error", r, e, this);
