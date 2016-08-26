@@ -182,9 +182,9 @@ function setup_queries() {
 
   var stale_range = make_search({
     chfield: "[Bug creation]",
-    chfieldfrom: "2016-04-25",
+    chfieldfrom: "2016-04-25", // change to date of first nightly of next version at release
     chfieldto: "Now",
-    f1: "cf_status_firefox48",
+    f1: "cf_status_firefox48", // increment version numbers at release
     f2: "cf_status_firefox49",
     f3: "cf_status_firefox50",
     f4: "cf_status_firefox51",
