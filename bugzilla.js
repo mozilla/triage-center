@@ -171,8 +171,8 @@ function setup_queries() {
     chfieldto: "Now",
     o1: "nowords",
     chfield: "[Bug creation]",
-    chfieldfrom: "2016-06-06", // change to date of first nightly of next version at release
-    f1: "cf_status_firefox50", // change to next version at release
+    chfieldfrom: "2016-08-01", // change to date of first nightly of next version at release
+    f1: "cf_status_firefox51", // change to next version at release
     resolution: "---",
     query_format: "advanced"
   }, common_params);
@@ -182,11 +182,11 @@ function setup_queries() {
 
   var stale_range = make_search({
     chfield: "[Bug creation]",
-    chfieldfrom: "2016-06-06", // change to date of first nightly of next version at release
+    chfieldfrom: "2016-08-01", // change to date of first nightly of next version at release
     chfieldto: "Now",
-    f1: "cf_status_firefox50", // increment version numbers at release 
-    f2: "cf_status_firefox51",
-    f3: "cf_status_firefox52",
+    f1: "cf_status_firefox51", // increment version numbers at release 
+    f2: "cf_status_firefox52",
+    f3: "cf_status_firefox53",
     j_top: "OR",
     keywords: "regression",
     keywords_type: "allwords",
