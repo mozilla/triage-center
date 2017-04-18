@@ -174,8 +174,8 @@ function setup_queries() {
     chfieldto: "Now",
     o1: "nowords",
     chfield: "[Bug creation]",
-    chfieldfrom: "2016-11-14", // change to date of first nightly of next version at release
-    f1: "cf_status_firefox53", // change to next version at release
+    chfieldfrom: "2017-01-23", // change to date of first nightly of next version at release
+    f1: "cf_status_firefox54", // change to next version at release
     resolution: "---",
     query_format: "advanced"
   }, common_params);
@@ -185,22 +185,19 @@ function setup_queries() {
 
   var stale_range = make_search({
     chfield: "[Bug creation]",
-    chfieldfrom: "2016-11-14", // change to date of first nightly of next version at release
+    chfieldfrom: "2017-01-23", // change to date of first nightly of next version at release
     chfieldto: "Now",
-    f1: "cf_status_firefox53", // increment version numbers at release 
-    f2: "cf_status_firefox54",
-    f3: "cf_status_firefox55",
+    f1: "cf_status_firefox54", // increment version numbers at release 
+    f2: "cf_status_firefox55",
     j_top: "OR",
     keywords: "regression",
     keywords_type: "allwords",
     o1: "nowords",
     o2: "nowords",
-    o3: "nowords",
     query_format: "advanced",
     resolution: "---",
     v1: "affected,unaffected,fixed,verified,disabled,verified disabled,wontfix,fix-optional",
-    v2: "affected,unaffected,fixed,verified,disabled,verified disabled,wontfix,fix-optional",
-    v3: "affected,unaffected,fixed,verified,disabled,verified disabled,wontfix,fix-optional"
+    v2: "affected,unaffected,fixed,verified,disabled,verified disabled,wontfix,fix-optional"
   }, common_params);
   document.getElementById("range-list").href = "https://bugzilla.mozilla.org/buglist.cgi?" + stale_range.toString();
   populate_table($("#range-stale"), stale_range, $("#range-stale-marker"), !!selected.length);
