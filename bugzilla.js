@@ -132,6 +132,8 @@ function setup_queries() {
     email1: "intermittent-bug-filer@mozilla.bugs",
     emailtype1: "notequals",
     emailreporter1: 1,
+    keywords: "meta",
+    keywords_type: "nowords",
     resolution: "---",
     chfield: "[Bug creation]",
     chfieldto: "Now",
