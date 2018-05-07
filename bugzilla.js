@@ -132,6 +132,8 @@ function setup_queries() {
     email1: "intermittent-bug-filer@mozilla.bugs",
     emailtype1: "notequals",
     emailreporter1: 1,
+    keywords: "meta",
+    keywords_type: "nowords",
     resolution: "---",
     chfield: "[Bug creation]",
     chfieldto: "Now",
@@ -174,8 +176,8 @@ function setup_queries() {
     chfieldto: "Now",
     o1: "nowords",
     chfield: "[Bug creation]",
-    chfieldfrom: "2017-09-21", // change to date of first nightly of next version at release
-    f1: "cf_status_firefox58", // change to next version at release
+    chfieldfrom: "2018-01-22", // change to date of first nightly of next version at release
+    f1: "cf_status_firefox60", // change to next version at release
     resolution: "---",
     query_format: "advanced"
   }, common_params);
@@ -185,10 +187,10 @@ function setup_queries() {
 
   var stale_range = make_search({
     chfield: "[Bug creation]",
-    chfieldfrom: "2017-09-21", // change to date of first nightly of next version at release
+    chfieldfrom: "2017-01-22", // change to date of first nightly of next version at release
     chfieldto: "Now",
-    f1: "cf_status_firefox58", // increment version numbers at release 
-    f2: "cf_status_firefox59",
+    f1: "cf_status_firefox60", // increment version numbers at release 
+    f2: "cf_status_firefox61",
     j_top: "OR",
     keywords: "regression",
     keywords_type: "allwords",
@@ -267,7 +269,7 @@ function bug_priority(d) {
             priority = 'P3: Backlog';
             break;
         case 'p4':
-            priority = 'P4: Backlog (but should be P3)';
+            priority = 'P4: Bot Managed';
             break;
         case 'p5':
             priority = 'P5: Won\'t fix but will accept a patch';
