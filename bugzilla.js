@@ -39,6 +39,17 @@ function selected_from_url() {
   setup_queries();
 }
 
+// Takes an array of bugs and returns only those for which there is
+// at least one flag set that's a needinfo where the requestee and
+// setter are not the same
+function filter_self_needinfos(bugs) {
+  return bugs.filter(function(bug) {
+    return bug.flags.some(function(flag) {
+      return flag.name == "needinfo" && flag.requestee != flag.setter;
+    }
+  });
+}
+
 $(function() {
   $(".badge").hide();
   $("#tabs").tabs({ heightStyle: "fill", active: 1 });
@@ -154,7 +165,7 @@ function setup_queries() {
     query_format: "advanced",
   }, common_params);
   document.getElementById("stuck-list").href = "https://bugzilla.mozilla.org/buglist.cgi?" + stale_needinfo.toString();
-  populate_table($("#needinfo-stale"), stale_needinfo, $("#needinfo-stale-marker"), !!selected.length);
+  populate_table($("#needinfo-stale"), stale_needinfo, $("#needinfo-stale-marker"), !!selected.length, filter_self_needinfos);
 
   var stale_review = make_search({
     f1: "flagtypes.name",
@@ -280,7 +291,7 @@ function bug_priority(d) {
     return priority;
 }
 
-function populate_table(s, params, marker, some_selected) {
+function populate_table(s, params, marker, some_selected, filter_fn) {
   if (!some_selected) {
     $(".p", s).hide();
     d3.select(s[0]).selectAll('.bugtable > tbody > tr').remove();
@@ -292,7 +303,7 @@ function populate_table(s, params, marker, some_selected) {
     $(".p", s)
       .button({ icons: { primary: 'ui-icon-refresh' }, label: 'Refresh', text: false })
       .on("click", function() { populate_table(s, params, marker, true); });
-    var bugs = data.bugs;
+    var bugs = filter_fn ? filter_fn(data.bugs) : data.bugs;
     if (!bugs.length) {
       marker.text("(none!)").removeClass("pending");
     } else {
