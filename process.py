@@ -1,7 +1,7 @@
 import json
 import urllib2
 
-fd = urllib2.urlopen("https://bugzilla.mozilla.org/rest/product?type=selectable&include_fields=id,name,components,is_active")
+fd = urllib2.urlopen("https://bugzilla.mozilla.org/rest/product?type=enterable&include_fields=id,name,components,is_active")
 d = json.load(fd)
 
 components = []
