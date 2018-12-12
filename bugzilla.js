@@ -46,7 +46,7 @@ function filter_self_needinfos(bugs) {
   return bugs.filter(function(bug) {
     return bug.flags.some(function(flag) {
       return flag.name == "needinfo" && flag.requestee != flag.setter;
-    }
+    });
   });
 }
 
