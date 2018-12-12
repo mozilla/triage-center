@@ -315,7 +315,8 @@ function populate_table(s, params, marker, some_selected, filter_fn) {
     rows.exit().remove();
     var new_rows = rows.enter().append("tr");
     new_rows.append("th").append("a")
-      .attr("href", function(d) { return "https://bugzilla.mozilla.org/show_bug.cgi?id=" + d.id; }).text(function(d) { return d.id; });
+      .attr("href", function(d) { return "https://bugzilla.mozilla.org/show_bug.cgi?id=" + d.id; })
+      .attr("target", "_blank").text(function(d) { return d.id; });
     new_rows.append("td").classed("bugpriority", true);
     new_rows.append("td").classed("bugdescription", true);
     new_rows.append("td").classed("bugcomponent", true);
