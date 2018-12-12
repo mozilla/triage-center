@@ -149,7 +149,7 @@ function setup_queries() {
     chfield: "[Bug creation]",
     chfieldto: "Now",
     query_format: "advanced",
-    chfieldfrom: "2017-06-01",
+    chfieldfrom: "2018-09-04", // Change to first nightly of current release 
   }, common_params);
   document.getElementById("triage-list").href = "https://bugzilla.mozilla.org/buglist.cgi?" + to_triage.toString();
   populate_table($("#need-decision"), to_triage, $("#need-decision-marker"), !!selected.length);
@@ -187,8 +187,8 @@ function setup_queries() {
     chfieldto: "Now",
     o1: "nowords",
     chfield: "[Bug creation]",
-    chfieldfrom: "2018-03-12", // change to date of first nightly of next version at release
-    f1: "cf_status_firefox61", // change to next version at release
+    chfieldfrom: "2018-10-22", // change to date of first nightly of next version at release
+    f1: "cf_status_firefox65", // change to next version at release
     resolution: "---",
     query_format: "advanced"
   }, common_params);
@@ -198,10 +198,10 @@ function setup_queries() {
 
   var stale_range = make_search({
     chfield: "[Bug creation]",
-    chfieldfrom: "2017-03-12", // change to date of first nightly of next version at release
+    chfieldfrom: "2017-10-22", // change to date of first nightly of next version at release
     chfieldto: "Now",
-    f1: "cf_status_firefox61", // increment version numbers at release 
-    f2: "cf_status_firefox62",
+    f1: "cf_status_firefox65", // increment version numbers at release 
+    f2: "cf_status_firefox66",
     j_top: "OR",
     keywords: "regression",
     keywords_type: "allwords",
