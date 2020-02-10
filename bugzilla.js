@@ -1,4 +1,8 @@
 var API_BASE = "https://bugzilla.mozilla.org/rest/";
+var FIRST_NIGHTLY_CURRENT = '2019-12-02'; // first nightly of current release
+var FIRST_NIGHTLY_NEXT = '2020-01-06'; // first nightly of next version at release
+var STATUS_CURRENT_VERSION = 'cf_status_firefox73';
+var STATUS_NEXT_VERSION = 'cf_status_firefox74';
 
 /**
  * @returns d3.request
@@ -149,7 +153,7 @@ function setup_queries() {
     chfield: "[Bug creation]",
     chfieldto: "Now",
     query_format: "advanced",
-    chfieldfrom: "2019-10-21", // Change to first nightly of current release
+    chfieldfrom: FIRST_NIGHTLY_CURRENT, // Change to first nightly of current release
   }, common_params);
   document.getElementById("triage-list").href = "https://bugzilla.mozilla.org/buglist.cgi?" + to_triage.toString();
   populate_table($("#need-decision"), to_triage, $("#need-decision-marker"), !!selected.length);
@@ -187,8 +191,8 @@ function setup_queries() {
     chfieldto: "Now",
     o1: "nowords",
     chfield: "[Bug creation]",
-    chfieldfrom: "2019-12-02", // change to date of first nightly of next version at release
-    f1: "cf_status_firefox73", // change to next version at release
+    chfieldfrom: FIRST_NIGHTLY_NEXT, // change to date of first nightly of next version at release
+    f1: STATUS_NEXT_VERSION, // change to next version at release
     resolution: "---",
     query_format: "advanced"
   }, common_params);
@@ -198,10 +202,10 @@ function setup_queries() {
 
   var stale_range = make_search({
     chfield: "[Bug creation]",
-    chfieldfrom: "2019-12-02", // change to date of first nightly of next version at release
+    chfieldfrom: FIRST_NIGHTLY_NEXT, // change to date of first nightly of next version at release
     chfieldto: "Now",
-    f1: "cf_status_firefox72", // increment version numbers at release
-    f2: "cf_status_firefox73",
+    f1: STATUS_CURRENT_VERSION, // increment version numbers at release
+    f2: STATUS_NEXT_VERSION,
     j_top: "OR",
     keywords: "regression",
     keywords_type: "allwords",
