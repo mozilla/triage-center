@@ -1,8 +1,17 @@
 var API_BASE = "https://bugzilla.mozilla.org/rest/";
+
+// change for each release
+
 var FIRST_NIGHTLY_CURRENT = '2020-03-09'; // first nightly of current release
 var FIRST_NIGHTLY_NEXT = '2020-04-06'; // first nightly of next version at release
-var STATUS_CURRENT_VERSION = 'cf_status_firefox76';
-var STATUS_NEXT_VERSION = 'cf_status_firefox77';
+var NIGHTLY = '78';
+var BETA    = '77';
+var RELEASE = '76';
+var ESR     = '68';
+var STATUS_RELEASE_VERSION = 'cf_status_firefox' + RELEASE;
+var STATUS_BETA_VERSION = 'cf_status_firefox' + BETA;
+var STATUS_NIGHTLY_VERSION = 'cf_status_firefox' + NIGHTLY;
+var STATUS_ESR_VERSION = 'cf_status_firefox_esr' + ESR;
 
 /**
  * @returns d3.request
@@ -213,7 +222,7 @@ function setup_queries() {
     o1: "nowords",
     chfield: "[Bug creation]",
     chfieldfrom: FIRST_NIGHTLY_NEXT, // change to date of first nightly of next version at release
-    f1: STATUS_NEXT_VERSION, // change to next version at release
+    f1: STATUS_BETA_VERSION, // change to next version at release
     resolution: "---",
     query_format: "advanced"
   }, common_params);
@@ -225,8 +234,8 @@ function setup_queries() {
     chfield: "[Bug creation]",
     chfieldfrom: FIRST_NIGHTLY_NEXT, // change to date of first nightly of next version at release
     chfieldto: "Now",
-    f1: STATUS_CURRENT_VERSION, // increment version numbers at release
-    f2: STATUS_NEXT_VERSION,
+    f1: STATUS_RELEASE_VERSION, // increment version numbers at release
+    f2: STATUS_BETA_VERSION,
     j_top: "OR",
     keywords: "regression",
     keywords_type: "allwords",
@@ -346,6 +355,20 @@ function bug_severity(d) {
       return severity;
 }
 
+
+function status_on_trains(d) {
+  var status_on_trains = ''
+  if (d[STATUS_RELEASE_VERSION] === '---' &
+      d[STATUS_BETA_VERSION] === '---' &
+      d[STATUS_NIGHTLY_VERSION]=== '---' &
+      d[STATUS_ESR_VERSION] === '---') {
+        status_on_trains = 'Please review and update release train (nightly, beta, release, esr) statuses';
+      } else {
+        status_on_trains = '---';
+      }
+  return status_on_trains;
+}
+
 function populate_table(s, params, marker, some_selected, filter_fn) {
   if (!some_selected) {
     $(".p", s).hide();
@@ -374,12 +397,14 @@ function populate_table(s, params, marker, some_selected, filter_fn) {
       .attr("target", "_blank").text(function(d) { return d.id; });
     new_rows.append("td").classed("bugpriority", true);
     new_rows.append("td").classed("bugseverity", true);
+    new_rows.append("td").classed("statuses", true);
     new_rows.append("td").classed("bugdescription", true);
     new_rows.append("td").classed("bugcomponent", true);
     new_rows.append("td").classed("bugusers", true);
     new_rows.append("td").classed("bugcreated", true);
     rows.select(".bugpriority ").text(bug_priority);
     rows.select(".bugseverity").text(bug_severity);
+    rows.select(".statuses").text(status_on_trains);
     rows.select(".bugdescription").text(bug_description);
     rows.select(".bugcomponent").text(bug_component);
     rows.select(".bugusers").text(bug_users);
