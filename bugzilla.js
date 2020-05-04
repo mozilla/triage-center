@@ -1,5 +1,5 @@
 var API_BASE = "https://bugzilla.mozilla.org/rest/";
-var FIRST_NIGHTLY_CURRENT = '2019-03-09'; // first nightly of current release
+var FIRST_NIGHTLY_CURRENT = '2020-03-09'; // first nightly of current release
 var FIRST_NIGHTLY_NEXT = '2020-04-06'; // first nightly of next version at release
 var STATUS_CURRENT_VERSION = 'cf_status_firefox76';
 var STATUS_NEXT_VERSION = 'cf_status_firefox77';
@@ -139,20 +139,41 @@ function setup_queries() {
   });
 
   var to_triage = make_search({
-    priority: "--",
-    n1: 1,
-    f1: "flagtypes.name",
-    o1: "substring",
-    v1: "needinfo",
-    email1: "intermittent-bug-filer@mozilla.bugs",
-    emailtype1: "notequals",
+
+    email1: 'intermittent-bug-filer@mozilla.bugs',
+    email2: 'wptsync@mozilla.bugs',
     emailreporter1: 1,
-    keywords: "meta",
-    keywords_type: "nowords",
-    resolution: "---",
+    emailreporter2: 1,
+    emailtype1: 'notequals',
+    emailtype2: 'notequals',
+    f1: 'component',
+    f2: 'OP',
+    f3: 'cf_status_firefox_nightly',
+    f4: 'cf_status_firefox_beta',
+    f5: 'cf_status_firefox_release',
+    f6: 'cf_status_firefox_esr',
+    f7: 'bug_type',
+    f8: 'CP',
+    f9: 'bug_severity',
+    j_top: 'OR',
+    limit: '0',
+    o1: 'equals',
+    o3: 'equals',
+    o4: 'equals',
+    o5: 'equals',
+    o6: 'equals',
+    o7: 'equals',
+    o9: 'equals',
+    resolution: '---',
+    v1: 'untriaged',
+    v3: '---',
+    v4: '---',
+    v5: '---',
+    v6: '---',
+    v7: 'defect',
+    v9: '--',
     chfield: "[Bug creation]",
     chfieldto: "Now",
-    query_format: "advanced",
     chfieldfrom: FIRST_NIGHTLY_CURRENT, // Change to first nightly of current release
   }, common_params);
   document.getElementById("triage-list").href = "https://bugzilla.mozilla.org/buglist.cgi?" + to_triage.toString();
@@ -316,8 +337,11 @@ function bug_severity(d) {
       case 'n/a':
         severity = 'N/A (Not Applicable)';
         break;
-      default:
+      case 'normal':
         severity = 'Normal (this is the old default value; and should be reviewed)';
+        break;
+      default: 
+        severity = d.severity + ' (This should be updated to the new, correct value)';
       }  
       return severity;
 }
