@@ -395,16 +395,16 @@ function populate_table(s, params, marker, some_selected, filter_fn) {
     new_rows.append("th").append("a")
       .attr("href", function(d) { return "https://bugzilla.mozilla.org/show_bug.cgi?id=" + d.id; })
       .attr("target", "_blank").text(function(d) { return d.id; });
-    new_rows.append("td").classed("bugpriority", true);
     new_rows.append("td").classed("bugseverity", true);
     new_rows.append("td").classed("statuses", true);
+    new_rows.append("td").classed("bugpriority", true);
     new_rows.append("td").classed("bugdescription", true);
     new_rows.append("td").classed("bugcomponent", true);
     new_rows.append("td").classed("bugusers", true);
     new_rows.append("td").classed("bugcreated", true);
-    rows.select(".bugpriority ").text(bug_priority);
     rows.select(".bugseverity").text(bug_severity);
     rows.select(".statuses").text(status_on_trains);
+    rows.select(".bugpriority ").text(bug_priority);
     rows.select(".bugdescription").text(bug_description);
     rows.select(".bugcomponent").text(bug_component);
     rows.select(".bugusers").text(bug_users);
