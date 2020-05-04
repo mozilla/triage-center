@@ -280,6 +280,10 @@ function bug_component(d) {
   return d.product + ": " + d.component;
 }
 
+function bug_type(d) {
+  return d.type;
+}
+
 function bug_description(d) {
   var s = d.summary;
   if (d.keywords.length) {
@@ -395,6 +399,7 @@ function populate_table(s, params, marker, some_selected, filter_fn) {
     new_rows.append("th").append("a")
       .attr("href", function(d) { return "https://bugzilla.mozilla.org/show_bug.cgi?id=" + d.id; })
       .attr("target", "_blank").text(function(d) { return d.id; });
+    new_rows.append("td").classed("bugtype", true);
     new_rows.append("td").classed("bugseverity", true);
     new_rows.append("td").classed("statuses", true);
     new_rows.append("td").classed("bugpriority", true);
@@ -402,6 +407,7 @@ function populate_table(s, params, marker, some_selected, filter_fn) {
     new_rows.append("td").classed("bugcomponent", true);
     new_rows.append("td").classed("bugusers", true);
     new_rows.append("td").classed("bugcreated", true);
+    rows.select(".bugtype").text(bug_type);
     rows.select(".bugseverity").text(bug_severity);
     rows.select(".statuses").text(status_on_trains);
     rows.select(".bugpriority ").text(bug_priority);
