@@ -290,9 +290,36 @@ function bug_priority(d) {
             priority = 'P5: Won\'t fix but will accept a patch';
             break;
         default:
-            priority = 'Undefined (this shouldn\'t happen)';
+            priority = 'Undefined (this shouldn\'t happen; contact the maintainer)';
     }
     return priority;
+}
+
+function bug_severity(d) {
+    var severity = '';
+    switch(d.severity.toLowerCase()) {
+      case '--':
+        severity = 'No Severity Set';
+        break;
+      case 's1':
+        severity = 'S1: (Catastrophic)';
+        break;
+      case 's2':
+        severity = 'S2: (Serious)';
+        break;
+      case 's3':
+        severity = 'S3: (Normal)';
+        break;
+      case 's4':
+        severity = 'S4: (Trivial)';
+        break;
+      case 'n/a':
+        severity = 'N/A (Not Applicable)';
+        break;
+      default:
+        severity = 'Normal (this is the old default value; and should be reviewed)';
+      }  
+      return severity;
 }
 
 function populate_table(s, params, marker, some_selected, filter_fn) {
@@ -322,11 +349,13 @@ function populate_table(s, params, marker, some_selected, filter_fn) {
       .attr("href", function(d) { return "https://bugzilla.mozilla.org/show_bug.cgi?id=" + d.id; })
       .attr("target", "_blank").text(function(d) { return d.id; });
     new_rows.append("td").classed("bugpriority", true);
+    new_rows.append("td").classed("bugseverity", true);
     new_rows.append("td").classed("bugdescription", true);
     new_rows.append("td").classed("bugcomponent", true);
     new_rows.append("td").classed("bugusers", true);
     new_rows.append("td").classed("bugcreated", true);
     rows.select(".bugpriority ").text(bug_priority);
+    rows.select(".bugseverity").text(bug_severity);
     rows.select(".bugdescription").text(bug_description);
     rows.select(".bugcomponent").text(bug_component);
     rows.select(".bugusers").text(bug_users);
