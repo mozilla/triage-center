@@ -1,8 +1,8 @@
 var API_BASE = "https://bugzilla.mozilla.org/rest/";
-var FIRST_NIGHTLY_CURRENT = '2019-02-10'; // first nightly of current release
-var FIRST_NIGHTLY_NEXT = '2020-03-09'; // first nightly of next version at release
-var STATUS_CURRENT_VERSION = 'cf_status_firefox75';
-var STATUS_NEXT_VERSION = 'cf_status_firefox76';
+var FIRST_NIGHTLY_CURRENT = '2019-03-09'; // first nightly of current release
+var FIRST_NIGHTLY_NEXT = '2020-04-06'; // first nightly of next version at release
+var STATUS_CURRENT_VERSION = 'cf_status_firefox76';
+var STATUS_NEXT_VERSION = 'cf_status_firefox77';
 
 /**
  * @returns d3.request
