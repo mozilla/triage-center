@@ -66,6 +66,9 @@ function filter_self_needinfos(bugs) {
 $(function() {
   $(".badge").hide();
   $("#tabs").tabs({ heightStyle: "fill", active: 1 });
+  $(window).resize(function() {
+    $("#tabs").tabs("refresh");
+  });
   $("#stale-inner").accordion({ heightStyle: "content", collapsible: true, active: false });
 
   get_components().then(setup_components).then(() => {
