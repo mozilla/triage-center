@@ -163,7 +163,7 @@ function setup_queries() {
     v2: "needinfo%3F",
     f3: "OP",
     f4: "bug_severity",
-    o4: "equals",
+    o4: "anyexact",
     v4: "--",
     f5: "component",
     o5: "equals",
