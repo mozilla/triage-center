@@ -338,7 +338,7 @@ function bug_severity(d) {
         severity = 'S4: (Trivial)';
         break;
       case 'n/a':
-        severity = 'N/A (Not Applicable)';
+        severity = 'Triage problem: Defects cannot have a severity of N/A';
         break;
       case 'normal':
         severity = 'Normal (this is the old default value; and should be reviewed)';
