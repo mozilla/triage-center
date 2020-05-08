@@ -349,20 +349,6 @@ function bug_severity(d) {
       return severity;
 }
 
-
-function status_on_trains(d) {
-  var status_on_trains = ''
-  if (d[STATUS_RELEASE_VERSION] === '---' &
-      d[STATUS_BETA_VERSION] === '---' &
-      d[STATUS_NIGHTLY_VERSION]=== '---' &
-      d[STATUS_ESR_VERSION] === '---') {
-        status_on_trains = 'Please review and update release train (nightly, beta, release, esr) statuses';
-      } else {
-        status_on_trains = '---';
-      }
-  return status_on_trains;
-}
-
 function populate_table(s, params, marker, some_selected, filter_fn) {
   if (!some_selected) {
     $(".p", s).hide();
@@ -391,7 +377,6 @@ function populate_table(s, params, marker, some_selected, filter_fn) {
       .attr("target", "_blank").text(function(d) { return d.id; });
     new_rows.append("td").classed("bugtype", true);
     new_rows.append("td").classed("bugseverity", true);
-    new_rows.append("td").classed("statuses", true);
     new_rows.append("td").classed("bugpriority", true);
     new_rows.append("td").classed("bugdescription", true);
     new_rows.append("td").classed("bugcomponent", true);
@@ -399,7 +384,6 @@ function populate_table(s, params, marker, some_selected, filter_fn) {
     new_rows.append("td").classed("bugcreated", true);
     rows.select(".bugtype").text(bug_type);
     rows.select(".bugseverity").text(bug_severity);
-    rows.select(".statuses").text(status_on_trains);
     rows.select(".bugpriority ").text(bug_priority);
     rows.select(".bugdescription").text(bug_description);
     rows.select(".bugcomponent").text(bug_component);
