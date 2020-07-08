@@ -163,7 +163,7 @@ function setup_queries() {
     v1: "defect",
     f2: "flagtypes.name",
     o2: "notsubstring",
-    v2: "needinfo%3F",
+    v2: "needinfo",
     f3: "OP",
     f4: "bug_severity",
     o4: "anyexact",
