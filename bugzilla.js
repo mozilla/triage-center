@@ -241,6 +241,34 @@ function setup_queries() {
   }, common_params);
   document.getElementById("range-list").href = "https://bugzilla.mozilla.org/buglist.cgi?" + stale_range.toString();
   populate_table($("#range-stale"), stale_range, $("#range-stale-marker"), !!selected.length);
+
+  // generate search by severity value
+
+  var by_severity = function(severity) {
+    return make_search({
+      resolution: "---",
+      chfield: "[Bug creation]",
+      chfieldfrom: FIRST_NIGHTLY_CURRENT,
+      chfieldto: "Now",
+      f1: "bug_severity",
+      o1: "anyexact",
+      v1: severity,
+      f2: "assigned_to",
+      o2: "equals",
+      v2: "nobody@mozilla.org",
+      f3: "flagtypes.name",
+      o3: "notsubstring",
+      v3: "needinfo",
+    }, common_params);
+  }
+
+  var blockers = by_severity('s1');
+  document.getElementById("blocker-list").href = "https:bugzilla.mozilla.org/buglist.cgi?" + blockers.toString();
+  populate_table($("#blockers"), blockers, $("#blocker-marker"), !!selected.length);
+
+  var criticals = by_severity('s2');
+  document.getElementById("critical-list").href = "https:bugzilla.mozilla.org/buglist.cgi?" + criticals.toString();
+  populate_table($("#criticals"), criticals, $("#critical-marker"), !!selected.length);
 }
 
 function navigate_url() {
