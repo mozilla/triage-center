@@ -259,6 +259,9 @@ function setup_queries() {
       f3: "flagtypes.name",
       o3: "notsubstring",
       v3: "needinfo",
+      f4: `cf_status_firefox${NIGHTLY}`,
+      o4: "nowords",
+      v4: "fixed, verified, wontfix, disabled, unaffected"
     }, common_params);
   }
 
