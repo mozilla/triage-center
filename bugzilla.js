@@ -2,11 +2,11 @@ var API_BASE = "https://bugzilla.mozilla.org/rest/";
 
 // change for each release
 
-var FIRST_NIGHTLY_CURRENT = '2020-05-04'; // first nightly of current release
-var FIRST_NIGHTLY_NEXT = '2020-06-01'; // first nightly of next version at release
-var NIGHTLY = '80';
-var BETA    = '79';
-var RELEASE = '78';
+var FIRST_NIGHTLY_CURRENT = '2020-06-01'; // first nightly of current release
+var FIRST_NIGHTLY_NEXT = '2020-07-07'; // first nightly of next version at release
+var NIGHTLY = '81';
+var BETA    = '80';
+var RELEASE = '79';
 var ESR     = '78';
 var STATUS_RELEASE_VERSION = 'cf_status_firefox' + RELEASE;
 var STATUS_BETA_VERSION = 'cf_status_firefox' + BETA;
