@@ -151,13 +151,12 @@ function setup_queries() {
   });
 
   var to_triage = make_search({
-    email1: "intermittent-bug-filer%40mozilla.bugs",
+    email1: "wptsync%40mozilla.bugs",
     emailreporter1: "1",
     emailtype1: "notequals",
-    email2: "wptsync%40mozilla.bugs",
-    emailreporter2: "1",
-    emailtype2: "notequals",
     resolution: "---",
+    keywords_type: "nowords",
+    keywords: "intermittent_failure",
     f1: "bug_type",
     o1: "equals",
     v1: "defect",
