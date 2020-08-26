@@ -2,36 +2,124 @@
 
 const API_BASE = "https://bugzilla.mozilla.org/rest/";
 
-// change for each release
+// populated by get_versions()
+let FIRST_NIGHTLY_RELEASE; // first nightly of current release
+let FIRST_NIGHTLY_BETA; // first nightly of next version at release
+let NIGHTLY;
+let BETA;
+let RELEASE;
+let STATUS_RELEASE_VERSION;
+let STATUS_BETA_VERSION;
 
-const FIRST_NIGHTLY_CURRENT = "2020-06-01"; // first nightly of current release
-const FIRST_NIGHTLY_NEXT = "2020-07-07"; // first nightly of next version at release
-const NIGHTLY = "81";
-const BETA = "80";
-const RELEASE = "79";
-const STATUS_RELEASE_VERSION = "cf_status_firefox" + RELEASE;
-const STATUS_BETA_VERSION = "cf_status_firefox" + BETA;
-
-/**
- * @returns d3.request
- */
-function make_api_request(path, params, data, method) {
+function make_api_request(path, params) {
   let uri = API_BASE + path;
   if (params) {
     uri += "?" + params.toString();
   }
-  let r = d3.json(uri);
-
-  method = "GET";
-  data = null;
-
-  return r.send(method, data);
+  return d3.json(uri).send("GET", null);
 }
 
 let gComponents;
 
+function build_hub_request(version) {
+  return {
+    post_filter: {
+      bool: {
+        must: [
+          {
+            term: {
+              "target.version": version + ".0a1",
+            },
+          },
+          {
+            term: {
+              "target.channel": "nightly",
+            },
+          },
+          {
+            term: {
+              "source.product": "firefox",
+            },
+          },
+        ],
+      },
+    },
+    size: 1,
+    sort: [
+      {
+        "download.date": "asc",
+      },
+    ],
+  };
+}
+
+async function get_versions() {
+  const $loading = $("#loading");
+  $loading.progressbar({ value: false });
+
+  await fetch("https://product-details.mozilla.org/1.0/firefox_versions.json")
+    .then((r) => {
+      return r.json();
+    })
+    .then((r) => {
+      NIGHTLY = r["FIREFOX_NIGHTLY"].split(".")[0];
+      BETA = r["FIREFOX_DEVEDITION"].split(".")[0];
+      RELEASE = r["LATEST_FIREFOX_VERSION"].split(".")[0];
+      STATUS_RELEASE_VERSION = "cf_status_firefox" + RELEASE;
+      STATUS_BETA_VERSION = "cf_status_firefox" + BETA;
+    });
+
+  await fetch("https://buildhub.moz.tools/api/search", {
+    method: "post",
+    body: JSON.stringify(build_hub_request(BETA)),
+  })
+    .then((r) => {
+      return r.json();
+    })
+    .then((r) => {
+      if (r.hits.hits.length !== 1) {
+        alert("Failed to determine build date for v" + 79);
+      }
+      FIRST_NIGHTLY_BETA = r.hits.hits[0]._source.download.date.substring(
+        0,
+        10
+      );
+    });
+
+  await fetch("https://buildhub.moz.tools/api/search", {
+    method: "post",
+    body: JSON.stringify(build_hub_request(RELEASE)),
+  })
+    .then((r) => {
+      return r.json();
+    })
+    .then((r) => {
+      if (r.hits.hits.length !== 1) {
+        alert("Failed to determine build date for v" + 79);
+      }
+      FIRST_NIGHTLY_RELEASE = r.hits.hits[0]._source.download.date.substring(
+        0,
+        10
+      );
+    });
+
+  console.log(
+    "Current Versions:",
+    "Nightly=" + NIGHTLY,
+    "Beta=" + BETA,
+    "Release=" + RELEASE
+  );
+  console.log(
+    "First Nightly Dates:",
+    "Beta=" + FIRST_NIGHTLY_BETA,
+    "Release=" + FIRST_NIGHTLY_RELEASE
+  );
+
+  $loading.hide();
+}
+
 function get_components() {
-  $("#component-loading").progressbar({ value: false });
+  $("#loading").progressbar({ value: false });
   return fetch("components-min.json")
     .then(function (r) {
       return r.json();
@@ -39,7 +127,7 @@ function get_components() {
     .then(function (r) {
       gComponents = r;
       selected_from_url();
-      $("#component-loading").hide();
+      $("#loading").hide();
     });
 }
 
@@ -47,8 +135,7 @@ function selected_from_url() {
   let sp = new URLSearchParams(window.location.search);
   let components = new Set(sp.getAll("component"));
   gComponents.forEach(function (c) {
-    let test = c.product_name + ":" + c.component_name;
-    c.selected = components.has(test);
+    c.selected = components.has(c.product_name + ":" + c.component_name);
   });
   setup_queries();
 }
@@ -64,7 +151,7 @@ function filter_self_needinfos(bugs) {
   });
 }
 
-$(function () {
+async function init() {
   $(".badge").hide();
   $("#tabs").tabs({ heightStyle: "fill", active: 1 });
   $(window).resize(function () {
@@ -75,6 +162,8 @@ $(function () {
     collapsible: true,
     active: false,
   });
+
+  await get_versions();
 
   get_components()
     .then(setup_components)
@@ -87,6 +176,7 @@ $(function () {
         $("#tabs").tabs("option", "active", 2);
       }
     });
+
   d3.select("#filter").on("input", function () {
     setup_components();
   });
@@ -94,6 +184,10 @@ $(function () {
     selected_from_url();
     setup_components();
   });
+}
+
+$(function () {
+  init().then();
 });
 
 function setup_components() {
@@ -199,7 +293,7 @@ function setup_queries() {
       limit: "0",
       chfield: "[Bug creation]",
       chfieldto: "Now",
-      chfieldfrom: FIRST_NIGHTLY_CURRENT, // Change to first nightly of current release
+      chfieldfrom: FIRST_NIGHTLY_RELEASE,
     },
     common_params
   );
@@ -266,8 +360,8 @@ function setup_queries() {
       chfieldto: "Now",
       o1: "nowords",
       chfield: "[Bug creation]",
-      chfieldfrom: FIRST_NIGHTLY_NEXT, // change to date of first nightly of next version at release
-      f1: STATUS_BETA_VERSION, // change to next version at release
+      chfieldfrom: FIRST_NIGHTLY_BETA,
+      f1: STATUS_BETA_VERSION,
       resolution: "---",
       query_format: "advanced",
     },
@@ -286,9 +380,9 @@ function setup_queries() {
   let stale_range = make_search(
     {
       chfield: "[Bug creation]",
-      chfieldfrom: FIRST_NIGHTLY_NEXT, // change to date of first nightly of next version at release
+      chfieldfrom: FIRST_NIGHTLY_BETA,
       chfieldto: "Now",
-      f1: STATUS_RELEASE_VERSION, // increment version numbers at release
+      f1: STATUS_RELEASE_VERSION,
       f2: STATUS_BETA_VERSION,
       j_top: "OR",
       keywords: "regression",
@@ -320,7 +414,7 @@ function setup_queries() {
       {
         resolution: "---",
         chfield: "[Bug creation]",
-        chfieldfrom: FIRST_NIGHTLY_CURRENT,
+        chfieldfrom: FIRST_NIGHTLY_RELEASE,
         chfieldto: "Now",
         f1: "bug_severity",
         o1: "anyexact",
