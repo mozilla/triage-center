@@ -255,22 +255,12 @@ function setup_queries() {
   });
   gPendingQueries.clear();
 
-  let selected = gComponents.filter(function (c) {
+  let selected = gComponents.filter((c) => {
     return c.selected;
   });
-  let products = new Set();
-  let components = new Set();
-  selected.forEach(function (c) {
-    products.add(c.product_name);
-    components.add(c.component_name);
-  });
-
-  let common_params = new URLSearchParams();
-  Array.from(products.values()).forEach(function (p) {
-    common_params.append("product", p);
-  });
-  Array.from(components.values()).forEach(function (c) {
-    common_params.append("component", c);
+  let components = [];
+  selected.forEach((c) => {
+    components.push({ product: c.product_name, component: c.component_name });
   });
 
   let to_triage = make_search(
@@ -295,7 +285,7 @@ function setup_queries() {
       chfieldto: "Now",
       chfieldfrom: FIRST_NIGHTLY_RELEASE,
     },
-    common_params
+    components
   );
   document.getElementById("triage-list").href =
     "https://bugzilla.mozilla.org/buglist.cgi?" + to_triage.toString();
@@ -308,16 +298,16 @@ function setup_queries() {
 
   let stale_needinfo = make_search(
     {
+      query_format: "advanced",
+      resolution: "---",
       f1: "flagtypes.name",
       o1: "substring",
       v1: "needinfo",
       f2: "delta_ts",
       o2: "lessthan", // means "older than"
       v2: "14d",
-      resolution: "---",
-      query_format: "advanced",
     },
-    common_params
+    components
   );
   document.getElementById("stuck-list").href =
     "https://bugzilla.mozilla.org/buglist.cgi?" + stale_needinfo.toString();
@@ -331,16 +321,16 @@ function setup_queries() {
 
   let stale_review = make_search(
     {
+      query_format: "advanced",
+      resolution: "---",
       f1: "flagtypes.name",
       o1: "regexp",
       v1: "^(review|superreview|ui-review|feedback|a11y-review)\\?",
-      resolution: "---",
       f2: "delta_ts",
       o2: "lessthan", // means "older than"
       v2: "5d",
-      query_format: "advanced",
     },
-    common_params
+    components
   );
   document.getElementById("review-list").href =
     "https://bugzilla.mozilla.org/buglist.cgi?" + stale_review.toString();
@@ -353,19 +343,19 @@ function setup_queries() {
 
   let stale_decision = make_search(
     {
+      query_format: "advanced",
+      resolution: "---",
       keywords: "regression",
       keywords_type: "allwords",
-      v1:
-        "affected,unaffected,fixed,verified,disabled,verified disabled,wontfix,fix-optional",
-      chfieldto: "Now",
-      o1: "nowords",
       chfield: "[Bug creation]",
       chfieldfrom: FIRST_NIGHTLY_BETA,
+      chfieldto: "Now",
       f1: STATUS_BETA_VERSION,
-      resolution: "---",
-      query_format: "advanced",
+      o1: "nowords",
+      v1:
+        "affected,unaffected,fixed,verified,disabled,verified disabled,wontfix,fix-optional",
     },
-    common_params
+    components
   );
 
   document.getElementById("decision-list").href =
@@ -379,24 +369,26 @@ function setup_queries() {
 
   let stale_range = make_search(
     {
+      query_format: "advanced",
+      resolution: "---",
+      keywords: "regression",
+      keywords_type: "allwords",
       chfield: "[Bug creation]",
       chfieldfrom: FIRST_NIGHTLY_BETA,
       chfieldto: "Now",
-      f1: STATUS_RELEASE_VERSION,
-      f2: STATUS_BETA_VERSION,
-      j_top: "OR",
-      keywords: "regression",
-      keywords_type: "allwords",
-      o1: "nowords",
+      f1: "OP",
+      j1: "OR",
+      f2: STATUS_RELEASE_VERSION,
       o2: "nowords",
-      query_format: "advanced",
-      resolution: "---",
-      v1:
-        "affected,unaffected,fixed,verified,disabled,verified disabled,wontfix,fix-optional",
       v2:
         "affected,unaffected,fixed,verified,disabled,verified disabled,wontfix,fix-optional",
+      f3: STATUS_BETA_VERSION,
+      o3: "nowords",
+      v3:
+        "affected,unaffected,fixed,verified,disabled,verified disabled,wontfix,fix-optional",
+      f4: "CP",
     },
-    common_params
+    components
   );
   document.getElementById("range-list").href =
     "https://bugzilla.mozilla.org/buglist.cgi?" + stale_range.toString();
@@ -429,7 +421,7 @@ function setup_queries() {
         o4: "nowords",
         v4: "fixed, verified, wontfix, disabled, unaffected",
       },
-      common_params
+      components
     );
   };
 
@@ -467,19 +459,56 @@ function navigate_url() {
   window.history.pushState(undefined, undefined, u.href);
 }
 
-function make_search(o, base) {
-  let s = new URLSearchParams(base);
-  Object.keys(o).forEach(function (k) {
-    let v = o[k];
-    if (v instanceof Array) {
-      v.forEach(function (v2) {
-        s.append(k, v2);
-      });
-    } else {
-      s.append(k, v);
+function make_search(params, components) {
+  let search = new URLSearchParams();
+
+  // add provided query parameters
+  let field_number = 0;
+  Object.keys(params).forEach((name) => {
+    if (name[0] === "f") {
+      if (name === "j_top") {
+        throw "Cannot set j_top, use a group with an OR joiner (f#=OP,j#=OR)";
+      }
+      const num = name.substring(1) * 1;
+      if (num > field_number) {
+        field_number = num;
+      }
     }
+    search.append(name, params[name]);
   });
-  return s;
+
+  // Add components.  We can't use product= and component= query parameters as it
+  // hits on matching products OR components, rather than a product/component pair.
+  // Instead we build a query which does:
+  // .. ((product AND component) OR (product AND component) ...)
+  if (components.length) {
+    field_number++;
+    search.append("f" + field_number, "OP");
+    search.append("j" + field_number, "OR");
+
+    for (const c of components) {
+      field_number++;
+      search.append("f" + field_number, "OP");
+
+      field_number++;
+      search.append("f" + field_number, "product");
+      search.append("o" + field_number, "equals");
+      search.append("v" + field_number, c.product);
+
+      field_number++;
+      search.append("f" + field_number, "component");
+      search.append("o" + field_number, "equals");
+      search.append("v" + field_number, c.component);
+
+      field_number++;
+      search.append("f" + field_number, "CP");
+    }
+
+    field_number++;
+    search.append("f" + field_number, "CP");
+  }
+
+  return search;
 }
 
 function bug_component(d) {
