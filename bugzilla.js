@@ -281,9 +281,6 @@ function setup_queries() {
       o3: "anyexact",
       v3: "--, n/a",
       limit: "0",
-      chfield: "[Bug creation]",
-      chfieldto: "Now",
-      chfieldfrom: FIRST_NIGHTLY_RELEASE,
     },
     components
   );
