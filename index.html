@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Build Triage Links for Bugzilla Component(s)</title>
   <link rel="stylesheet" type="text/css" href="jquery-ui-1.11.4/jquery-ui.min.css">
-  <link rel="stylesheet" type="text/css" href="index.css">
+  <link rel="stylesheet" type="text/css" href="index.css?20211019">
   <link rel="icon shortcut" href="Green_bug_and_broom.svg" type="image/svg">
 </head>
 <body>
@@ -62,8 +62,8 @@
       <div id="stale-inner">
         <h3>Triage decision needed <span id="need-decision-marker" class="marker"></span></h3>
         <section id="need-decision">
-          <p><a href="#" target="_blank" id="triage-list">View as bug list</a></p>
           <div class="p"></div>
+          <div class="buglist"><a href="#" target="_blank" id="triage-list">View as bug list</a></div>
           <table class="bugtable">
             <tbody></tbody>
           </table>
@@ -71,8 +71,8 @@
 
         <h3>NEEDINFO &gt; 14 days <span id="needinfo-stale-marker" class="marker"></span></h3>
         <section id="needinfo-stale">
-          <p><a href="#" target="_blank" id="stuck-list">View as bug list</a></p>
           <div class="p"></div>
+          <div class="buglist"><a href="#" target="_blank" id="stuck-list">View as bug list</a></div>
           <table class="bugtable">
             <tbody></tbody>
           </table>
@@ -80,8 +80,8 @@
 
         <h3>Requests &gt; 5 days <span id="review-stale-marker" class="marker"></span></h3>
         <section id="review-stale">
-          <p><a href="#" target="_blank" id="review-list">View as bug list</a></p>
           <div class="p"></div>
+          <div class="buglist"><a href="#" target="_blank" id="review-list">View as bug list</a></div>
           <table class="bugtable">
             <tbody></tbody>
           </table>
@@ -89,8 +89,8 @@
 
         <h3>Regressions that need a decision for next release <span id="decision-stale-marker" class="marker"></span></h3>
         <section id="decision-stale">
-          <p><a href="#" target="_blank" id="decision-list">View as bug list</a></p>
           <div class="p"></div>
+          <div class="buglist"><a href="#" target="_blank" id="decision-list">View as bug list</a></div>
           <table class="bugtable">
             <tbody></tbody>
           </table>
@@ -98,8 +98,8 @@
 
         <h3>Regressions without status flags <span id="range-stale-marker" class="marker"></span></h3>
         <section id="range-stale">
-          <p><a href="#" target="_blank" id="range-list">View as bug list</a></p>
           <div class="p"></div>
+          <div class="buglist"><a href="#" target="_blank" id="range-list">View as bug list</a></div>
           <table class="bugtable">
             <tbody></tbody>
           </table>
@@ -108,8 +108,8 @@
 
         <h3>Blocker (S1) defects w/o assignee and no pending NEEDINFO <span id="blocker-marker" class="marker"></span></h3>
         <section id="blockers">
-          <p><a href="#" target="_blank" id="blocker-list">View as bug list</a></p>
           <div class="p"></div>
+          <div class="buglist"><a href="#" target="_blank" id="blocker-list">View as bug list</a></div>
           <table class="bugtable">
             <tbody></tbody>
           </table>
@@ -117,8 +117,8 @@
 
         <h3>Critical (S2) defects w/o assignee and no pending NEEDINFO <span id="critical-marker" class="marker"></span></h3>
         <section id="criticals">
-          <p><a href="#" target="_blank" id="critical-list">View as bug list</a></p>
           <div class="p"></div>
+          <div class="buglist"><a href="#" target="_blank" id="critical-list">View as bug list</a></div>
           <table class="bugtable">
             <tbody></tbody>
           </table>
@@ -132,7 +132,7 @@
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
   <script type="text/javascript" src="jquery-ui-1.11.4/jquery-ui.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
-  <script type="text/javascript" src="bugzilla.js"></script>
+  <script type="text/javascript" src="bugzilla.js?20211019"></script>
 </body>
 </html>
 

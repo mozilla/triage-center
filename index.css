@@ -1,6 +1,7 @@
 html {
   height: 100%;
 }
+
 body {
   font-family: sans-serif;
   box-sizing: border-box;
@@ -11,42 +12,59 @@ body {
   height: 100%;
 }
 
+a:hover {
+  text-decoration: underline;
+}
+
 #tabs {
   height: 100%;
   padding: 0;
   flex: 1;
 }
+
 #tabs > section {
 }
+
 #components {
   width: 100%;
   border-collapse: collapse;
 }
+
 #components tr {
   border-bottom: 1px solid #AAA;
 }
+
 #components td, #components th {
   vertical-align: top;
   text-align: left;
-  padding: 1px;
-  margin: 0px;
+  padding: 5px;
+  margin: 0;
 }
-#components td {
+
+#components th {
   white-space: nowrap;
 }
+
 #templates {
   display: none;
 }
+
 .marker {
   color: green;
 }
+
 .marker.pending {
   color: red;
 }
 
 .bugtable {
-  table-layout: fixed;
   width: 100%;
+  border-spacing: 5px;
+}
+
+.bugtable th,
+.bugtable td {
+  padding: 0 5px;
 }
 
 .bugdescription,
@@ -59,7 +77,21 @@ body {
   width: 35%;
 }
 
+.bugpriority,
+.bugseverity,
 .bugcreated {
-  /* wrap between the day (10 characters) and time */
-  width: 10ch;
+  white-space: nowrap;
+}
+
+.buglist {
+  display: inline-block;
+}
+
+.ui-widget {
+  font-family: sans-serif;
+  font-size: 12pt;
+}
+
+.ui-accordion .ui-accordion-content {
+  padding: 1em;
 }

@@ -352,8 +352,7 @@ function setup_queries() {
       chfieldto: "Now",
       f1: STATUS_BETA_VERSION,
       o1: "nowords",
-      v1:
-        "affected,unaffected,fixed,verified,disabled,verified disabled,wontfix,fix-optional",
+      v1: "affected,unaffected,fixed,verified,disabled,verified disabled,wontfix,fix-optional",
     },
     components
   );
@@ -380,12 +379,10 @@ function setup_queries() {
       j1: "OR",
       f2: STATUS_RELEASE_VERSION,
       o2: "nowords",
-      v2:
-        "affected,unaffected,fixed,verified,disabled,verified disabled,wontfix,fix-optional",
+      v2: "affected,unaffected,fixed,verified,disabled,verified disabled,wontfix,fix-optional",
       f3: STATUS_BETA_VERSION,
       o3: "nowords",
-      v3:
-        "affected,unaffected,fixed,verified,disabled,verified disabled,wontfix,fix-optional",
+      v3: "affected,unaffected,fixed,verified,disabled,verified disabled,wontfix,fix-optional",
       f4: "CP",
     },
     components
@@ -508,6 +505,24 @@ function make_search(params, components) {
     search.append("f" + field_number, "CP");
   }
 
+  search.append(
+    "include_fields",
+    [
+      "assigned_to",
+      "component",
+      "creation_time",
+      "creator",
+      "flags",
+      "id",
+      "keywords",
+      "priority",
+      "product",
+      "severity",
+      "summary",
+      "type",
+    ].join(",")
+  );
+
   return search;
 }
 
@@ -516,7 +531,7 @@ function bug_component(d) {
 }
 
 function bug_type(d) {
-  return d.type;
+  return d.type === "enhancement" ? "enh" : d.type;
 }
 
 function bug_description(d) {
@@ -528,9 +543,12 @@ function bug_description(d) {
 }
 
 function bug_users(d) {
-  let s = "Owner: " + d.assigned_to;
-  s += " Reporter: " + d.creator;
-  return s;
+  return (
+    "Owner: " +
+    escapeHtml(d.assigned_to_detail.nick) +
+    "<br>Reporter: " +
+    escapeHtml(d.creator_detail.nick)
+  );
 }
 
 function bug_created(d) {
@@ -542,24 +560,24 @@ function bug_priority(d) {
     case "--":
       return "No Priority";
     case "p1":
-      return "P1: This Release/Iteration";
+      return "P1: This";
     case "p2":
-      return "P2: Next Release/Iteration";
+      return "P2: Next";
     case "p3":
       return "P3: Backlog";
     case "p4":
       return "P4: Bot Managed";
     case "p5":
-      return "P5: Won't fix but will accept a patch";
+      return "P5: Community";
     default:
-      return "Undefined (this shouldn't happen; contact the maintainer)";
+      return "Undefined";
   }
 }
 
 function bug_severity(d) {
   switch (d.severity.toLowerCase()) {
     case "--":
-      return "No Severity Set";
+      return "-";
     case "s1":
       return "S1: (Catastrophic)";
     case "s2":
@@ -571,7 +589,7 @@ function bug_severity(d) {
     case "n/a":
       return "Triage problem: Defects cannot have a severity of N/A";
     case "normal":
-      return "Normal (this is the old default value; and should be reviewed)";
+      return "Retriage";
     default:
       return d.severity + " (This should be updated to the new, correct value)";
   }
@@ -598,7 +616,7 @@ function populate_table(s, params, marker, some_selected, filter_fn) {
         });
       let bugs = filter_fn ? filter_fn(data.bugs) : data.bugs;
       if (!bugs.length) {
-        marker.text("(none!)").removeClass("pending");
+        marker.text("(none)").removeClass("pending");
       } else {
         marker.text("(" + bugs.length + ")").addClass("pending");
       }
@@ -636,7 +654,7 @@ function populate_table(s, params, marker, some_selected, filter_fn) {
       rows.select(".bugpriority ").text(bug_priority);
       rows.select(".bugdescription").text(bug_description);
       rows.select(".bugcomponent").text(bug_component);
-      rows.select(".bugusers").text(bug_users);
+      rows.select(".bugusers").html(bug_users);
       rows.select(".bugcreated").text(bug_created);
       rows.order();
     })
@@ -645,4 +663,10 @@ function populate_table(s, params, marker, some_selected, filter_fn) {
       gPendingQueries.delete(r);
     });
   gPendingQueries.add(r);
+}
+
+function escapeHtml(text) {
+  return text.replace(/["&<>]/g, function (a) {
+    return { '"': "&quot;", "&": "&amp;", "<": "&lt;", ">": "&gt;" }[a];
+  });
 }
