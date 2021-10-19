@@ -78,7 +78,7 @@ async function get_versions() {
     })
     .then((r) => {
       if (r.hits.hits.length !== 1) {
-        alert("Failed to determine build date for v" + 79);
+        alert("Failed to determine build date for v" + BETA);
       }
       FIRST_NIGHTLY_BETA = r.hits.hits[0]._source.download.date.substring(
         0,
@@ -95,7 +95,7 @@ async function get_versions() {
     })
     .then((r) => {
       if (r.hits.hits.length !== 1) {
-        alert("Failed to determine build date for v" + 79);
+        alert("Failed to determine build date for v" + RELEASE);
       }
       FIRST_NIGHTLY_RELEASE = r.hits.hits[0]._source.download.date.substring(
         0,
