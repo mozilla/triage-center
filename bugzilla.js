@@ -630,7 +630,7 @@ function populate_table(
           text: false,
         })
         .on("click", function () {
-          populate_table(s, params, marker, true);
+          populate_table(s, params, marker, true, { filter_fn, sort_fn });
         });
       let bugs = filter_fn ? filter_fn(data.bugs) : data.bugs;
       if (!bugs.length) {
