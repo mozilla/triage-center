@@ -151,6 +151,18 @@ function filter_self_needinfos(bugs) {
   });
 }
 
+/**
+ * @param {*} bug a bug object from the Bugzilla API
+ * @returns {number} the number of days since the last needinfo was made
+ */
+function get_last_needinfo_date(bug) {
+  const date = bug.flags
+    .filter((flag) => flag.name === "needinfo")
+    .map((flag) => flag.modification_date)
+    .sort((a, b) => b - a)[0];
+  return Date.parse(date);
+}
+
 async function init() {
   $(".badge").hide();
   $("#tabs").tabs({ heightStyle: "fill", active: 1 });
@@ -313,7 +325,10 @@ function setup_queries() {
     stale_needinfo,
     $("#needinfo-stale-marker"),
     !!selected.length,
-    filter_self_needinfos
+    {
+      filter_fn: filter_self_needinfos,
+      sort_fn: (a, b) => get_last_needinfo_date(a) - get_last_needinfo_date(b),
+    }
   );
 
   let stale_review = make_search(
@@ -592,7 +607,13 @@ function bug_severity(d) {
   }
 }
 
-function populate_table(s, params, marker, some_selected, filter_fn) {
+function populate_table(
+  s,
+  params,
+  marker,
+  some_selected,
+  { filter_fn, sort_fn } = {}
+) {
   if (!some_selected) {
     $(".p", s).hide();
     d3.select(s[0]).selectAll(".bugtable > tbody > tr").remove();
@@ -609,7 +630,7 @@ function populate_table(s, params, marker, some_selected, filter_fn) {
           text: false,
         })
         .on("click", function () {
-          populate_table(s, params, marker, true);
+          populate_table(s, params, marker, true, { filter_fn, sort_fn });
         });
       let bugs = filter_fn ? filter_fn(data.bugs) : data.bugs;
       if (!bugs.length) {
@@ -617,9 +638,13 @@ function populate_table(s, params, marker, some_selected, filter_fn) {
       } else {
         marker.text("(" + bugs.length + ")").addClass("pending");
       }
-      bugs.sort(function (a, b) {
-        return d3.ascending(a.id, b.id);
-      });
+      if (sort_fn) {
+        bugs.sort(sort_fn);
+      } else {
+        bugs.sort(function (a, b) {
+          return d3.ascending(a.id, b.id);
+        });
+      }
       let rows = d3
         .select(s[0])
         .select(".bugtable > tbody")
