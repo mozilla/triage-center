@@ -436,7 +436,7 @@ function setup_queries() {
 
   let blockers = by_severity("s1");
   document.getElementById("blocker-list").href =
-    "https:bugzilla.mozilla.org/buglist.cgi?" + blockers.toString();
+    "https://bugzilla.mozilla.org/buglist.cgi?" + blockers.toString();
   populate_table(
     $("#blockers"),
     blockers,
@@ -446,7 +446,7 @@ function setup_queries() {
 
   let criticals = by_severity("s2");
   document.getElementById("critical-list").href =
-    "https:bugzilla.mozilla.org/buglist.cgi?" + criticals.toString();
+    "https://bugzilla.mozilla.org/buglist.cgi?" + criticals.toString();
   populate_table(
     $("#criticals"),
     criticals,
