@@ -453,6 +453,34 @@ function setup_queries() {
     $("#critical-marker"),
     !!selected.length
   );
+
+  // Longstanding triaged issues without needinfo
+  let longstandings = make_search(
+    {
+      email1: "wptsync%40mozilla.bugs",
+      emailreporter1: "1",
+      emailtype1: "notequals",
+      resolution: "---",
+      keywords_type: "nowords",
+      keywords: "intermittent_failure",
+      f1: "delta_ts",
+      o1: "lessthan", // means "older than"
+      v1: "365d",
+      f2: "flagtypes.name",
+      o2: "notsubstring",
+      v2: "needinfo",
+      limit: "0",
+    },
+    components
+  );
+  document.getElementById("longstanding-list").href =
+    "https://bugzilla.mozilla.org/buglist.cgi?" + longstandings.toString();
+  populate_table(
+    $("#longstandings"),
+    longstandings,
+    $("#longstanding-marker"),
+    !!selected.length
+  );
 }
 
 function navigate_url() {
