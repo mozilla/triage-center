@@ -174,6 +174,11 @@ async function init() {
     collapsible: true,
     active: false,
   });
+  $("#longstandings-inner").accordion({
+    heightStyle: "content",
+    collapsible: true,
+    active: false,
+  });
 
   await get_versions();
 
@@ -451,6 +456,61 @@ function setup_queries() {
     $("#criticals"),
     criticals,
     $("#critical-marker"),
+    !!selected.length
+  );
+
+  const longstanding_by_bug_type = function (bug_type) {
+    return make_search(
+      {
+        email1: "wptsync%40mozilla.bugs",
+        emailreporter1: "1",
+        emailtype1: "notequals",
+        resolution: "---",
+        keywords_type: "nowords",
+        keywords: "intermittent_failure",
+        f1: "delta_ts",
+        o1: "lessthan", // means "older than"
+        v1: "365d",
+        f2: "flagtypes.name",
+        o2: "notsubstring",
+        v2: "needinfo",
+        f3: "bug_type",
+        o3: "equals",
+        v3: bug_type,
+        limit: "0",
+      },
+      components
+    );
+  };
+
+  // Longstanding issues without needinfo
+  let longstanding_defects = longstanding_by_bug_type("defect");
+  document.getElementById("longstanding-defects-list").href =
+    "https://bugzilla.mozilla.org/buglist.cgi?" + longstanding_defects.toString();
+  populate_table(
+    $("#longstanding-defects"),
+    longstanding_defects,
+    $("#longstanding-defects-marker"),
+    !!selected.length
+  );
+
+  let longstanding_enhs = longstanding_by_bug_type("enhancement");
+  document.getElementById("longstanding-enhs-list").href =
+    "https://bugzilla.mozilla.org/buglist.cgi?" + longstanding_enhs.toString();
+  populate_table(
+    $("#longstanding-enhs"),
+    longstanding_enhs,
+    $("#longstanding-enhs-marker"),
+    !!selected.length
+  );
+
+  let longstanding_tasks = longstanding_by_bug_type("task");
+  document.getElementById("longstanding-tasks-list").href =
+    "https://bugzilla.mozilla.org/buglist.cgi?" + longstanding_tasks.toString();
+  populate_table(
+    $("#longstanding-tasks"),
+    longstanding_tasks,
+    $("#longstanding-tasks-marker"),
     !!selected.length
   );
 }
