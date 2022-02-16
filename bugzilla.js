@@ -282,7 +282,7 @@ function setup_queries() {
 
   let to_triage = make_search(
     {
-      email1: "wptsync%40mozilla.bugs",
+      email1: "wptsync@mozilla.bugs",
       emailreporter1: "1",
       emailtype1: "notequals",
       resolution: "---",
@@ -462,7 +462,7 @@ function setup_queries() {
   const longstanding_by_bug_type = function (bug_type) {
     return make_search(
       {
-        email1: "wptsync%40mozilla.bugs",
+        email1: "wptsync@mozilla.bugs",
         emailreporter1: "1",
         emailtype1: "notequals",
         resolution: "---",
