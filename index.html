@@ -15,12 +15,13 @@
       <li><a href="#intro">Introduction</a></li>
       <li><a href="#component-selector">Components</a></li>
       <li><a href="#stale">Attention Needed <span class="badge"></span></a></li>
+      <li><a href="#longstandings">Longstanding Issues</a></li>
     </ul>
     <section id="intro">
       <h1>Mozilla Bug Triage</h1>
 
       <p><strong>Update 2020-05-04:</strong> the queries on this
-      tool have been updated for <a href="https://docs.google.com/document/d/1HYPBDePvYX26JOrk6ymsEeViwTdWhCVL-elSwInsMKw/">the 
+      tool have been updated for <a href="https://docs.google.com/document/d/1HYPBDePvYX26JOrk6ymsEeViwTdWhCVL-elSwInsMKw/">the
       changes to Firefox bug
       triage</a>.</p>
 
@@ -105,7 +106,6 @@
           </table>
         </section>
 
-
         <h3>Blocker (S1) defects w/o assignee and no pending NEEDINFO <span id="blocker-marker" class="marker"></span></h3>
         <section id="blockers">
           <div class="p"></div>
@@ -123,11 +123,41 @@
             <tbody></tbody>
           </table>
         </section>
+      </div>
+    </section>
+    <section id="longstandings">
+      <h2>Longstanding issues</h2>
 
+      <div id="longstandings-inner">
+        <h3>Longstanding defects without needinfo > 365 days <span id="longstanding-defects-marker" class="marker"></span></h3>
+        <section id="longstanding-defects">
+          <div class="p"></div>
+          <div class="buglist"><a href="#" target="_blank" id="longstanding-defects-list">View as bug list</a></div>
+          <table class="bugtable">
+            <tbody></tbody>
+          </table>
+        </section>
+
+        <h3>Longstanding enhancements without needinfo > 365 days <span id="longstanding-enhs-marker" class="marker"></span></h3>
+        <section id="longstanding-enhs">
+          <div class="p"></div>
+          <div class="buglist"><a href="#" target="_blank" id="longstanding-enhs-list">View as bug list</a></div>
+          <table class="bugtable">
+            <tbody></tbody>
+          </table>
+        </section>
+
+        <h3>Longstanding tasks without needinfo > 365 days <span id="longstanding-tasks-marker" class="marker"></span></h3>
+        <section id="longstanding-tasks">
+          <div class="p"></div>
+          <div class="buglist"><a href="#" target="_blank" id="longstanding-tasks-list">View as bug list</a></div>
+          <table class="bugtable">
+            <tbody></tbody>
+          </table>
+        </section>
       </div>
     </section>
   </section>
-
 
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
   <script type="text/javascript" src="jquery-ui-1.11.4/jquery-ui.min.js"></script>
