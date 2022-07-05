@@ -5,7 +5,7 @@ requring action.
 
 Can be visited directly at https://mozilla.github.io/triage-center.
 
-To run locally, clone the repo, run `process.py` and then use
+To run locally, clone the repo, run `update_components.py` and then use
 `python3 -m http.server` or your preferred method to bring up a static server.
 
 Uses an [SVG favicon](https://commons.wikimedia.org/wiki/File:Green_bug_and_broom.svg),
