@@ -6,6 +6,18 @@ from pathlib import Path
 
 os.chdir(Path(__file__).resolve().parent)
 
+products_filter = (
+    "Core",
+    "DevTools",
+    "External Software Affecting Firefox",
+    "Firefox",
+    "NSPR",
+    "NSS",
+    "Remote Protocol",
+    "Toolkit",
+    "WebExtensions",
+)
+
 req = url_request.Request(
     "https://bugzilla.mozilla.org/rest/product?%s"
     % "&".join(
@@ -31,7 +43,7 @@ with url_request.urlopen(req) as r:
 
 components = []
 for product in product_list["products"]:
-    if not product["is_active"]:
+    if product["name"] not in products_filter:
         continue
     for component in product["components"]:
         if not component["is_active"]:
@@ -45,6 +57,8 @@ for product in product_list["products"]:
                 "component_description": component["description"],
             }
         )
+
+components.sort(key=lambda c: f"{c['product_name']}: {c['component_name']}")
 
 with open("components-min.json", "w") as f:
     json.dump(components, f, separators=(",", ":"))
