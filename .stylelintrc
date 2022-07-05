@@ -1,0 +1,12 @@
+{
+  "extends": "./node_modules/stylelint-config-standard",
+  "plugins": [ "./node_modules/stylelint-order" ],
+  "rules": {
+    "color-hex-length": "short",
+    "function-url-quotes": "never",
+    "indentation": 4,
+    "no-descending-specificity": null,
+    "order/properties-alphabetical-order": true,
+    "string-quotes": "double"
+  }
+}
