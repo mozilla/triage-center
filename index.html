@@ -4,13 +4,13 @@
         <meta charset="utf-8" />
         <meta http-equiv="x-ua-compatible" content="ie=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Build Triage Links for Bugzilla Component(s)</title>
+        <title>Bugzilla Triage Center</title>
         <link
             rel="stylesheet"
             type="text/css"
             href="jquery-ui-1.11.4/jquery-ui.min.css"
         />
-        <link rel="stylesheet" type="text/css" href="index.css?20211019" />
+        <link rel="stylesheet" type="text/css" href="index.css?20220804" />
         <link rel="icon shortcut" href="Green_bug_and_broom.svg" type="image/svg" />
     </head>
     <body>
@@ -21,17 +21,14 @@
                 <li>
                     <a href="#stale">Attention Needed <span class="badge"></span></a>
                 </li>
-                <li><a href="#longstandings">Longstanding Issues</a></li>
+                <li><a href="#longstandings">Stalled &amp; Longstanding</a></li>
             </ul>
             <section id="intro">
-                <h1>Mozilla Bug Triage</h1>
+                <h1>Bugzilla Triage Center</h1>
 
                 <p>
-                    Let's say you are in charge of triaging some set of components at
-                    bugzilla.mozilla.org. How do you do that? We'll have some
-                    purpose-built triage tools later, but for now you can use this tool
-                    to build triage queries to let you effectively triage your
-                    components.
+                    This tool helps you discover and track Firefox and related bugs,
+                    with a focus on triage.
                 </p>
 
                 <p>
@@ -80,6 +77,7 @@
             </section>
             <section id="stale">
                 <h2>Attention Needed</h2>
+                <p id="no-selections">No components selected.</p>
                 <div id="stale-inner">
                     <h3>
                         Triage decision needed
@@ -87,11 +85,17 @@
                     </h3>
                     <section id="need-decision">
                         <div class="p"></div>
-                        <div class="buglist">
-                            <a href="#" target="_blank" id="triage-list"
-                                >View as bug list</a
-                            >
+                        <div class="actions">
+                            <div class="refresh">
+                                <a href="#">Refresh</a>
+                            </div>
+                            <div class="buglist">
+                                <a href="#" target="_blank" id="triage-list"
+                                    >View as bug list</a
+                                >
+                            </div>
                         </div>
+                        <div class="zarro hidden">No bugs found.</div>
                         <table class="bugtable">
                             <tbody></tbody>
                         </table>
@@ -103,27 +107,39 @@
                     </h3>
                     <section id="needinfo-stale">
                         <div class="p"></div>
-                        <div class="buglist">
-                            <a href="#" target="_blank" id="stuck-list"
-                                >View as bug list</a
-                            >
+                        <div class="actions">
+                            <div class="refresh">
+                                <a href="#">Refresh</a>
+                            </div>
+                            <div class="buglist">
+                                <a href="#" target="_blank" id="stuck-list"
+                                    >View as bug list</a
+                                >
+                            </div>
                         </div>
+                        <div class="zarro hidden">No bugs found.</div>
                         <table class="bugtable">
                             <tbody></tbody>
                         </table>
                     </section>
 
                     <h3>
-                        Requests &gt; 5 days
-                        <span id="review-stale-marker" class="marker"></span>
+                        NEEDINFO escalations
+                        <span id="needinfo-escalation-marker" class="marker"></span>
                     </h3>
-                    <section id="review-stale">
+                    <section id="needinfo-escalation">
                         <div class="p"></div>
-                        <div class="buglist">
-                            <a href="#" target="_blank" id="review-list"
-                                >View as bug list</a
-                            >
+                        <div class="actions">
+                            <div class="refresh">
+                                <a href="#">Refresh</a>
+                            </div>
+                            <div class="buglist">
+                                <a href="#" target="_blank" id="escalation-list"
+                                    >View as bug list</a
+                                >
+                            </div>
                         </div>
+                        <div class="zarro hidden">No bugs found.</div>
                         <table class="bugtable">
                             <tbody></tbody>
                         </table>
@@ -135,11 +151,17 @@
                     </h3>
                     <section id="decision-stale">
                         <div class="p"></div>
-                        <div class="buglist">
-                            <a href="#" target="_blank" id="decision-list"
-                                >View as bug list</a
-                            >
+                        <div class="actions">
+                            <div class="refresh">
+                                <a href="#">Refresh</a>
+                            </div>
+                            <div class="buglist">
+                                <a href="#" target="_blank" id="decision-list"
+                                    >View as bug list</a
+                                >
+                            </div>
                         </div>
+                        <div class="zarro hidden">No bugs found.</div>
                         <table class="bugtable">
                             <tbody></tbody>
                         </table>
@@ -151,11 +173,17 @@
                     </h3>
                     <section id="range-stale">
                         <div class="p"></div>
-                        <div class="buglist">
-                            <a href="#" target="_blank" id="range-list"
-                                >View as bug list</a
-                            >
+                        <div class="actions">
+                            <div class="refresh">
+                                <a href="#">Refresh</a>
+                            </div>
+                            <div class="buglist">
+                                <a href="#" target="_blank" id="range-list"
+                                    >View as bug list</a
+                                >
+                            </div>
                         </div>
+                        <div class="zarro hidden">No bugs found.</div>
                         <table class="bugtable">
                             <tbody></tbody>
                         </table>
@@ -167,11 +195,17 @@
                     </h3>
                     <section id="blockers">
                         <div class="p"></div>
-                        <div class="buglist">
-                            <a href="#" target="_blank" id="blocker-list"
-                                >View as bug list</a
-                            >
+                        <div class="actions">
+                            <div class="refresh">
+                                <a href="#">Refresh</a>
+                            </div>
+                            <div class="buglist">
+                                <a href="#" target="_blank" id="blocker-list"
+                                    >View as bug list</a
+                                >
+                            </div>
                         </div>
+                        <div class="zarro hidden">No bugs found.</div>
                         <table class="bugtable">
                             <tbody></tbody>
                         </table>
@@ -183,11 +217,17 @@
                     </h3>
                     <section id="criticals">
                         <div class="p"></div>
-                        <div class="buglist">
-                            <a href="#" target="_blank" id="critical-list"
-                                >View as bug list</a
-                            >
+                        <div class="actions">
+                            <div class="refresh">
+                                <a href="#">Refresh</a>
+                            </div>
+                            <div class="buglist">
+                                <a href="#" target="_blank" id="critical-list"
+                                    >View as bug list</a
+                                >
+                            </div>
                         </div>
+                        <div class="zarro hidden">No bugs found.</div>
                         <table class="bugtable">
                             <tbody></tbody>
                         </table>
@@ -195,20 +235,50 @@
                 </div>
             </section>
             <section id="longstandings">
-                <h2>Longstanding issues</h2>
-
+                <h2>Stalled &amp; Longstanding</h2>
                 <div id="longstandings-inner">
+                    <h3>
+                        Defects with the "stalled" keyword
+                        <span id="stalled-marker" class="marker"></span>
+                    </h3>
+                    <section id="stalled">
+                        <div class="p"></div>
+                        <div class="actions">
+                            <div class="refresh">
+                                <a href="#">Refresh</a>
+                            </div>
+                            <div class="buglist">
+                                <a href="#" target="_blank" id="stalled-list"
+                                    >View as bug list</a
+                                >
+                            </div>
+                        </div>
+                        <div class="zarro hidden">No bugs found.</div>
+                        <table class="bugtable">
+                            <tbody></tbody>
+                        </table>
+                    </section>
+
                     <h3>
                         Longstanding defects without needinfo > 365 days
                         <span id="longstanding-defects-marker" class="marker"></span>
                     </h3>
                     <section id="longstanding-defects">
                         <div class="p"></div>
-                        <div class="buglist">
-                            <a href="#" target="_blank" id="longstanding-defects-list"
-                                >View as bug list</a
-                            >
+                        <div class="actions">
+                            <div class="refresh">
+                                <a href="#">Refresh</a>
+                            </div>
+                            <div class="buglist">
+                                <a
+                                    href="#"
+                                    target="_blank"
+                                    id="longstanding-defects-list"
+                                    >View as bug list</a
+                                >
+                            </div>
                         </div>
+                        <div class="zarro hidden">No bugs found.</div>
                         <table class="bugtable">
                             <tbody></tbody>
                         </table>
@@ -220,11 +290,17 @@
                     </h3>
                     <section id="longstanding-enhs">
                         <div class="p"></div>
-                        <div class="buglist">
-                            <a href="#" target="_blank" id="longstanding-enhs-list"
-                                >View as bug list</a
-                            >
+                        <div class="actions">
+                            <div class="refresh">
+                                <a href="#">Refresh</a>
+                            </div>
+                            <div class="buglist">
+                                <a href="#" target="_blank" id="longstanding-enhs-list"
+                                    >View as bug list</a
+                                >
+                            </div>
                         </div>
+                        <div class="zarro hidden">No bugs found.</div>
                         <table class="bugtable">
                             <tbody></tbody>
                         </table>
@@ -236,11 +312,17 @@
                     </h3>
                     <section id="longstanding-tasks">
                         <div class="p"></div>
-                        <div class="buglist">
-                            <a href="#" target="_blank" id="longstanding-tasks-list"
-                                >View as bug list</a
-                            >
+                        <div class="actions">
+                            <div class="refresh">
+                                <a href="#">Refresh</a>
+                            </div>
+                            <div class="buglist">
+                                <a href="#" target="_blank" id="longstanding-tasks-list"
+                                    >View as bug list</a
+                                >
+                            </div>
                         </div>
+                        <div class="zarro hidden">No bugs found.</div>
                         <table class="bugtable">
                             <tbody></tbody>
                         </table>
@@ -258,6 +340,6 @@
             type="text/javascript"
             src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"
         ></script>
-        <script type="text/javascript" src="bugzilla.js?20220118"></script>
+        <script type="text/javascript" src="bugzilla.js?20220804"></script>
     </body>
 </html>
