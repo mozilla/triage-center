@@ -7,13 +7,21 @@ from pathlib import Path
 os.chdir(Path(__file__).resolve().parent)
 
 products_filter = (
+    "Conduit",
     "Core",
     "DevTools",
     "External Software Affecting Firefox",
+    "Fenix",
+    "Firefox Build System",
+    "Firefox for Android",
+    "Firefox for iOS",
     "Firefox",
+    "GeckoView",
+    "JSS",
     "NSPR",
     "NSS",
     "Remote Protocol",
+    "Testing",
     "Toolkit",
     "WebExtensions",
 )
