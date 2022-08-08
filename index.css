@@ -117,6 +117,10 @@ a:hover {
     color: red;
 }
 
+.actions {
+    height: calc(2em + 2px);
+}
+
 .actions div {
     border: 1px solid #ddd;
     display: inline-block;
