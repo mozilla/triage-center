@@ -198,6 +198,8 @@ async function init() {
 
     await get_versions();
 
+    $(".next-release").text(`Firefox ${RELEASE}`);
+
     get_components()
         .then(setup_components)
         .then(() => {
