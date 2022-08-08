@@ -199,7 +199,7 @@ async function init() {
 
     await get_versions();
 
-    $(".next-release").text(`Firefox ${RELEASE}`);
+    $(".next-release").text(`Firefox ${NIGHTLY}`);
 
     get_components()
         .then(setup_components)
