@@ -22,6 +22,7 @@ function make_api_request(path, params) {
 }
 
 let gComponents;
+let gSelectedComponents;
 
 function build_hub_request(version) {
     return {
@@ -293,9 +294,12 @@ function setup_queries() {
     let selected = gComponents.filter((c) => {
         return c.selected;
     });
-    let components = [];
+    gSelectedComponents = [];
     selected.forEach((c) => {
-        components.push({ product: c.product_name, component: c.component_name });
+        gSelectedComponents.push({
+            product: c.product_name,
+            component: c.component_name,
+        });
     });
 
     if (selected.length) {
@@ -304,8 +308,10 @@ function setup_queries() {
         document.querySelector("#no-selections").classList.remove("hidden");
     }
 
-    let to_triage = make_search(
-        {
+    // Triage decision needed
+    populate_table({
+        id: "need-decision",
+        query: {
             email1: "wptsync@mozilla.bugs",
             emailreporter1: "1",
             emailtype1: "notequals",
@@ -323,65 +329,56 @@ function setup_queries() {
             v3: "--, n/a",
             limit: "0",
         },
-        components
-    );
-    populate_table(
-        $("#need-decision"),
-        to_triage,
-        $("#need-decision-marker"),
-        !!selected.length
-    );
+    });
 
-    let needinfo_search = make_search(
-        {
+    // NEEDINFO > 14 days
+    populate_table({
+        id: "needinfo-stale",
+        query: {
             query_format: "advanced",
             resolution: "---",
             f1: "flagtypes.name",
             o1: "substring",
             v1: "needinfo",
         },
-        components
-    );
-    populate_table(
-        $("#needinfo-stale"),
-        needinfo_search,
-        $("#needinfo-stale-marker"),
-        !!selected.length,
-        {
-            filter_fn: stale_needinfos,
-            sort_fn: (a, b) =>
-                get_oldest_needinfo_flag(b).age - get_oldest_needinfo_flag(a).age,
-            date_fn: (bug) => {
-                let ni = d3.time.format("%Y-%m-%d %H:%M")(
-                    new Date(get_oldest_needinfo_flag(bug).modification_date)
-                );
-                let created = bug_created(bug);
-                return `NeedInfo: ${ni}<br>Created: ${created}`;
-            },
-        }
-    );
+        filter_fn: stale_needinfos,
+        sort_fn: (a, b) =>
+            get_oldest_needinfo_flag(b).age - get_oldest_needinfo_flag(a).age,
+        date_fn: (bug) => {
+            let ni = d3.time.format("%Y-%m-%d %H:%M")(
+                new Date(get_oldest_needinfo_flag(bug).modification_date)
+            );
+            let created = bug_created(bug);
+            return `NeedInfo: ${ni}<br>Created: ${created}`;
+        },
+    });
 
-    populate_table(
-        $("#needinfo-escalation"),
-        needinfo_search,
-        $("#needinfo-escalation-marker"),
-        !!selected.length,
-        {
-            filter_fn: escalated_needinfos,
-            sort_fn: (a, b) =>
-                get_oldest_needinfo_flag(b).age - get_oldest_needinfo_flag(a).age,
-            date_fn: (bug) => {
-                let ni = d3.time.format("%Y-%m-%d %H:%M")(
-                    new Date(get_oldest_needinfo_flag(bug).modification_date)
-                );
-                let created = bug_created(bug);
-                return `NeedInfo: ${ni}<br>Created: ${created}`;
-            },
-        }
-    );
+    // NEEDINFO escalations
+    populate_table({
+        id: "needinfo-escalation",
+        query: {
+            query_format: "advanced",
+            resolution: "---",
+            f1: "flagtypes.name",
+            o1: "substring",
+            v1: "needinfo",
+        },
+        filter_fn: escalated_needinfos,
+        sort_fn: (a, b) =>
+            get_oldest_needinfo_flag(b).age - get_oldest_needinfo_flag(a).age,
+        date_fn: (bug) => {
+            let ni = d3.time.format("%Y-%m-%d %H:%M")(
+                new Date(get_oldest_needinfo_flag(bug).modification_date)
+            );
+            let created = bug_created(bug);
+            return `NeedInfo: ${ni}<br>Created: ${created}`;
+        },
+    });
 
-    let stale_decision = make_search(
-        {
+    // Regressions that need a decision
+    populate_table({
+        id: "decision-stale",
+        query: {
             query_format: "advanced",
             resolution: "---",
             keywords: "regression",
@@ -390,18 +387,12 @@ function setup_queries() {
             o1: "nowords",
             v1: "affected,unaffected,fixed,verified,disabled,verified disabled,wontfix,fix-optional",
         },
-        components
-    );
+    });
 
-    populate_table(
-        $("#decision-stale"),
-        stale_decision,
-        $("#decision-stale-marker"),
-        !!selected.length
-    );
-
-    let stale_range = make_search(
-        {
+    // Regressions without status flags
+    populate_table({
+        id: "range-stale",
+        query: {
             query_format: "advanced",
             resolution: "---",
             keywords: "regression",
@@ -419,53 +410,52 @@ function setup_queries() {
             o8: "nowords",
             v8: "P4,P5",
         },
-        components
-    );
+    });
 
-    populate_table(
-        $("#range-stale"),
-        stale_range,
-        $("#range-stale-marker"),
-        !!selected.length
-    );
+    // Blocker (S1) defects
+    populate_table({
+        id: "blockers",
+        query: {
+            resolution: "---",
+            f1: "bug_severity",
+            o1: "anyexact",
+            v1: "s1,blocker",
+            f2: "assigned_to",
+            o2: "equals",
+            v2: "nobody@mozilla.org",
+            f3: "flagtypes.name",
+            o3: "notsubstring",
+            v3: "needinfo",
+            f4: `cf_status_firefox${NIGHTLY}`,
+            o4: "nowords",
+            v4: "fixed, verified, wontfix, disabled, unaffected",
+        },
+    });
 
-    // generate search by severity value
+    // Critical (S2) defects
+    populate_table({
+        id: "criticals",
+        query: {
+            resolution: "---",
+            f1: "bug_severity",
+            o1: "anyexact",
+            v1: "s2,critical",
+            f2: "assigned_to",
+            o2: "equals",
+            v2: "nobody@mozilla.org",
+            f3: "flagtypes.name",
+            o3: "notsubstring",
+            v3: "needinfo",
+            f4: `cf_status_firefox${NIGHTLY}`,
+            o4: "nowords",
+            v4: "fixed, verified, wontfix, disabled, unaffected",
+        },
+    });
 
-    let by_severity = function (severity) {
-        return make_search(
-            {
-                resolution: "---",
-                f1: "bug_severity",
-                o1: "anyexact",
-                v1: severity,
-                f2: "assigned_to",
-                o2: "equals",
-                v2: "nobody@mozilla.org",
-                f3: "flagtypes.name",
-                o3: "notsubstring",
-                v3: "needinfo",
-                f4: `cf_status_firefox${NIGHTLY}`,
-                o4: "nowords",
-                v4: "fixed, verified, wontfix, disabled, unaffected",
-            },
-            components
-        );
-    };
-
-    let blockers = by_severity("s1,blocker");
-    populate_table($("#blockers"), blockers, $("#blocker-marker"), !!selected.length);
-
-    let criticals = by_severity("s2,critical");
-    populate_table(
-        $("#criticals"),
-        criticals,
-        $("#critical-marker"),
-        !!selected.length
-    );
-
-    // Bugs with the 'stalled' keyword
-    let stalled = make_search(
-        {
+    // Defects with the "stalled" keyword
+    populate_table({
+        id: "stalled",
+        query: {
             resolution: "---",
             keywords: "stalled",
             f1: "bug_type",
@@ -476,59 +466,76 @@ function setup_queries() {
             v2: "needinfo",
             limit: "0",
         },
-        components
-    );
-    populate_table($("#stalled"), stalled, $("#stalled-marker"), !!selected.length);
+    });
 
-    // Longstanding bugs without needinfo
+    // Longstanding defects
+    populate_table({
+        id: "longstanding-defects",
+        query: {
+            email1: "wptsync@mozilla.bugs",
+            emailreporter1: "1",
+            emailtype1: "notequals",
+            resolution: "---",
+            keywords_type: "nowords",
+            keywords: "intermittent_failure",
+            f1: "delta_ts",
+            o1: "lessthan", // means "older than"
+            v1: "365d",
+            f2: "flagtypes.name",
+            o2: "notsubstring",
+            v2: "needinfo",
+            f3: "bug_type",
+            o3: "equals",
+            v3: "defect",
+            limit: "0",
+        },
+    });
 
-    const longstanding_by_bug_type = function (bug_type) {
-        return make_search(
-            {
-                email1: "wptsync@mozilla.bugs",
-                emailreporter1: "1",
-                emailtype1: "notequals",
-                resolution: "---",
-                keywords_type: "nowords",
-                keywords: "intermittent_failure",
-                f1: "delta_ts",
-                o1: "lessthan", // means "older than"
-                v1: "365d",
-                f2: "flagtypes.name",
-                o2: "notsubstring",
-                v2: "needinfo",
-                f3: "bug_type",
-                o3: "equals",
-                v3: bug_type,
-                limit: "0",
-            },
-            components
-        );
-    };
+    // Longstanding enhancements
+    populate_table({
+        id: "longstanding-enhs",
+        query: {
+            email1: "wptsync@mozilla.bugs",
+            emailreporter1: "1",
+            emailtype1: "notequals",
+            resolution: "---",
+            keywords_type: "nowords",
+            keywords: "intermittent_failure",
+            f1: "delta_ts",
+            o1: "lessthan", // means "older than"
+            v1: "365d",
+            f2: "flagtypes.name",
+            o2: "notsubstring",
+            v2: "needinfo",
+            f3: "bug_type",
+            o3: "equals",
+            v3: "enhancement",
+            limit: "0",
+        },
+    });
 
-    let longstanding_defects = longstanding_by_bug_type("defect");
-    populate_table(
-        $("#longstanding-defects"),
-        longstanding_defects,
-        $("#longstanding-defects-marker"),
-        !!selected.length
-    );
-
-    let longstanding_enhs = longstanding_by_bug_type("enhancement");
-    populate_table(
-        $("#longstanding-enhs"),
-        longstanding_enhs,
-        $("#longstanding-enhs-marker"),
-        !!selected.length
-    );
-
-    let longstanding_tasks = longstanding_by_bug_type("task");
-    populate_table(
-        $("#longstanding-tasks"),
-        longstanding_tasks,
-        $("#longstanding-tasks-marker"),
-        !!selected.length
-    );
+    // Longstanding tasks
+    populate_table({
+        id: "longstanding-tasks",
+        query: {
+            email1: "wptsync@mozilla.bugs",
+            emailreporter1: "1",
+            emailtype1: "notequals",
+            resolution: "---",
+            keywords_type: "nowords",
+            keywords: "intermittent_failure",
+            f1: "delta_ts",
+            o1: "lessthan", // means "older than"
+            v1: "365d",
+            f2: "flagtypes.name",
+            o2: "notsubstring",
+            v2: "needinfo",
+            f3: "bug_type",
+            o3: "equals",
+            v3: "task",
+            limit: "0",
+        },
+    });
 }
 
 function navigate_url() {
@@ -542,76 +549,6 @@ function navigate_url() {
         sp.append("component", c.product_name + ":" + c.component_name);
     });
     window.history.pushState(undefined, undefined, u.href);
-}
-
-function make_search(params, components) {
-    let search = new URLSearchParams();
-
-    // add provided query parameters
-    let field_number = 0;
-    Object.keys(params).forEach((name) => {
-        if (name[0] === "f") {
-            if (name === "j_top") {
-                throw "Cannot set j_top, use a group with an OR joiner (f#=OP,j#=OR)";
-            }
-            const num = name.substring(1) * 1;
-            if (num > field_number) {
-                field_number = num;
-            }
-        }
-        search.append(name, params[name]);
-    });
-
-    // Add components.  We can't use product= and component= query parameters as it
-    // hits on matching products OR components, rather than a product/component pair.
-    // Instead we build a query which does:
-    // .. ((product AND component) OR (product AND component) ...)
-    if (components.length) {
-        field_number++;
-        search.append("f" + field_number, "OP");
-        search.append("j" + field_number, "OR");
-
-        for (const c of components) {
-            field_number++;
-            search.append("f" + field_number, "OP");
-
-            field_number++;
-            search.append("f" + field_number, "product");
-            search.append("o" + field_number, "equals");
-            search.append("v" + field_number, c.product);
-
-            field_number++;
-            search.append("f" + field_number, "component");
-            search.append("o" + field_number, "equals");
-            search.append("v" + field_number, c.component);
-
-            field_number++;
-            search.append("f" + field_number, "CP");
-        }
-
-        field_number++;
-        search.append("f" + field_number, "CP");
-    }
-
-    search.append(
-        "include_fields",
-        [
-            "assigned_to",
-            "component",
-            "creation_time",
-            "creator",
-            "flags",
-            "id",
-            "keywords",
-            "priority",
-            "product",
-            "severity",
-            "summary",
-            "type",
-        ].join(",")
-    );
-
-    return search;
 }
 
 function bug_component(d) {
@@ -683,20 +620,85 @@ function bug_severity(d) {
     }
 }
 
-function populate_table(
-    section,
-    search_params,
-    marker,
-    some_selected,
-    { filter_fn, sort_fn, date_fn } = {}
-) {
+function make_search(params) {
+    let search = new URLSearchParams();
+
+    // add provided query parameters
+    let field_number = 0;
+    Object.keys(params).forEach((name) => {
+        if (name[0] === "f") {
+            if (name === "j_top") {
+                throw "Cannot set j_top, use a group with an OR joiner (f#=OP,j#=OR)";
+            }
+            const num = name.substring(1) * 1;
+            if (num > field_number) {
+                field_number = num;
+            }
+        }
+        search.append(name, params[name]);
+    });
+
+    // Add components.  We can't use product= and component= query parameters as it
+    // hits on matching products OR components, rather than a product/component pair.
+    // Instead we build a query which does:
+    // .. ((product AND component) OR (product AND component) ...)
+    field_number++;
+    search.append("f" + field_number, "OP");
+    search.append("j" + field_number, "OR");
+
+    for (const c of gSelectedComponents) {
+        field_number++;
+        search.append("f" + field_number, "OP");
+
+        field_number++;
+        search.append("f" + field_number, "product");
+        search.append("o" + field_number, "equals");
+        search.append("v" + field_number, c.product);
+
+        field_number++;
+        search.append("f" + field_number, "component");
+        search.append("o" + field_number, "equals");
+        search.append("v" + field_number, c.component);
+
+        field_number++;
+        search.append("f" + field_number, "CP");
+    }
+
+    field_number++;
+    search.append("f" + field_number, "CP");
+
+    search.append(
+        "include_fields",
+        [
+            "assigned_to",
+            "component",
+            "creation_time",
+            "creator",
+            "flags",
+            "id",
+            "keywords",
+            "priority",
+            "product",
+            "severity",
+            "summary",
+            "type",
+        ].join(",")
+    );
+
+    return search;
+}
+
+function populate_table({ id, query, filter_fn, sort_fn, date_fn } = {}) {
+    const section = $(`#${id}`);
+    const marker = $(`#${id}-marker`);
+    const search_args = make_search(query);
     const list_btn = $(".buglist a", section);
     const list_container = $(".buglist", section);
     if (filter_fn === undefined) {
         list_btn.text("View as bug search");
         list_btn.attr(
             "href",
-            "https://bugzilla.mozilla.org/buglist.cgi?" + search_params.toString()
+            "https://bugzilla.mozilla.org/buglist.cgi?" + search_args.toString()
         );
         list_container.show();
     } else {
@@ -705,17 +707,18 @@ function populate_table(
         list_container.hide();
     }
 
-    if (!some_selected) {
+    if (!gSelectedComponents.length) {
         $(".p", section).hide();
         $(".actions", section).show();
         d3.select(section[0]).selectAll(".bugtable > tbody > tr").remove();
         marker.text("").removeClass("pending");
         return;
     }
+
     $(".actions", section).hide();
     $(".p", section).show().progressbar({ value: false }).off("click");
     marker.text("(loading)").addClass("loading");
-    let r = make_api_request("bug", search_params)
+    let r = make_api_request("bug", search_args)
         .on("load", function (data) {
             gPendingQueries.delete(r);
             marker.text("").removeClass("loading");
@@ -724,11 +727,7 @@ function populate_table(
             $(".refresh", section)
                 .off("click")
                 .on("click", () => {
-                    populate_table(section, search_params, marker, true, {
-                        filter_fn,
-                        sort_fn,
-                        date_fn,
-                    });
+                    populate_table({ id, query, filter_fn, sort_fn, date_fn });
                 });
             let bugs = filter_fn ? filter_fn(data.bugs) : data.bugs;
             if (!bugs.length) {
