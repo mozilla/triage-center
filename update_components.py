@@ -9,6 +9,7 @@ os.chdir(Path(__file__).resolve().parent)
 products_filter = (
     "Conduit",
     "Core",
+    "Data Platform and Tools",
     "DevTools",
     "External Software Affecting Firefox",
     "Fenix",
