@@ -10,6 +10,7 @@ products_filter = (
     "Conduit",
     "Core",
     "DevTools",
+    "Developer Infrastructure",
     "External Software Affecting Firefox",
     "Fenix",
     "Firefox Build System",
