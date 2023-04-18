@@ -22,6 +22,7 @@ products_filter = (
     "NSPR",
     "NSS",
     "Remote Protocol",
+    "Release Engineering",
     "Testing",
     "Toolkit",
     "WebExtensions",
