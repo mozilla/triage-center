@@ -1,6 +1,0 @@
-.DS_Store
-*.swp
-*.tmp
-/node_modules/
-/package-lock.json
-/yarn.lock
